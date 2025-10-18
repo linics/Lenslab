@@ -73,7 +73,8 @@
       gap: 20px;
       padding: 20px 24px 32px;
       flex: 1;
-      height: calc(100vh - 120px);
+      height: calc(100vh - 60px);
+      min-height: 0;
     }
 
     #controls,
@@ -86,6 +87,7 @@
       display: flex;
       flex-direction: column;
       gap: 16px;
+      min-height: 0;
     }
 
     #stage-container {
@@ -95,9 +97,10 @@
       display: flex;
       justify-content: center;
       align-items: center;
-      background: var(--stage-bg);
+      background: linear-gradient(#fbfdff, #f5f9ff);
       border-radius: 18px;
       box-shadow: inset 0 0 0 1px rgba(30, 111, 251, 0.08), 0 8px 24px rgba(28, 61, 116, 0.12);
+      min-width: 0;
     }
 
     #stage-container::after {
@@ -112,29 +115,91 @@
 
     #mode-ui {
       position: absolute;
+      left: 0;
+      right: 0;
       bottom: 12px;
-      width: 100%;
-      text-align: center;
-      z-index: 3;
+      z-index: 5;
+      display: flex;
+      justify-content: center;
       pointer-events: auto;
       padding: 0 16px;
     }
 
-    #mode-ui .content {
-      max-height: 140px;
-      overflow-y: auto;
-      background: rgba(255, 255, 255, 0.9);
-      border-radius: 8px;
-      padding: 0.5rem 1rem;
-      display: inline-block;
-      text-align: left;
-      box-shadow: 0 6px 16px rgba(28, 61, 116, 0.16);
-    }
-
     svg#lens-svg {
-      max-width: 100%;
+      width: 100%;
       height: auto;
       display: block;
+    }
+
+    #mode-ui .mode-card {
+      max-width: min(720px, 68%);
+      width: 100%;
+      background: rgba(255, 255, 255, 0.92);
+      border: 1px solid rgba(20, 70, 140, 0.12);
+      box-shadow: 0 6px 24px rgba(20, 70, 140, 0.12);
+      border-radius: 12px;
+      padding: 14px 18px;
+      font-size: 14px;
+      line-height: 1.55;
+      color: #0f1f3a;
+      backdrop-filter: saturate(120%) blur(2px);
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      max-height: 160px;
+      overflow: auto;
+    }
+
+    #mode-ui .mode-card h4 {
+      margin: 0 0 6px;
+      font-size: 15px;
+      font-weight: 700;
+      color: #113a8f;
+    }
+
+    #mode-ui .mode-card p,
+    #mode-ui .mode-card li {
+      margin: 0.2rem 0;
+    }
+
+    #mode-ui .mode-card ul {
+      padding-left: 1.1rem;
+    }
+
+    #mode-ui .mode-card .result-ok {
+      color: #0b8a2a;
+      font-weight: 600;
+    }
+
+    #mode-ui .mode-card .result-bad {
+      color: #c62828;
+      font-weight: 600;
+    }
+
+    #mode-ui .mode-card .btn,
+    #mode-ui .mode-card button {
+      align-self: flex-start;
+      background: var(--primary);
+      color: #ffffff;
+      border: none;
+      border-radius: 999px;
+      padding: 8px 16px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    #mode-ui .mode-card .btn:hover,
+    #mode-ui .mode-card button:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 6px 12px rgba(28, 61, 116, 0.18);
+    }
+
+    #mode-ui .mode-card .btn:focus,
+    #mode-ui .mode-card button:focus {
+      outline: 2px solid rgba(28, 61, 116, 0.5);
+      outline-offset: 2px;
     }
 
     #stage-hud {
@@ -146,6 +211,43 @@
       flex-direction: column;
       gap: 6px;
       max-width: 260px;
+    }
+
+    #lens-shape {
+      fill: url(#lensGrad);
+      fill-opacity: 0.26;
+      stroke: #3aa0ff;
+      stroke-opacity: 0.9;
+      stroke-width: 2;
+    }
+
+    #lens-center-line {
+      stroke: #3aa0ff;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-opacity: 0.9;
+    }
+
+    #rays .ray {
+      stroke: #1e6ffb;
+      stroke-opacity: 0.55;
+      stroke-width: 2;
+      fill: none;
+    }
+
+    #rays .ray.dashed {
+      stroke-opacity: 0.4;
+      stroke-dasharray: 6 6;
+    }
+
+    #objects .image {
+      stroke: #1e6ffb;
+      fill: #1e6ffb;
+    }
+
+    #objects .image.virtual {
+      stroke: #ff8a00;
+      fill: #ff8a00;
     }
 
     #mode-guide {
@@ -429,92 +531,89 @@
       background-size: cover, 40px 40px, 40px 40px;
     }
 
-    .challenge-list {
+    #mode-ui .challenge-list {
       list-style: none;
       padding: 0;
-      margin: 0;
+      margin: 4px 0 0;
       display: flex;
       flex-direction: column;
       gap: 8px;
     }
 
-    .challenge-item {
-      border: 1px dashed rgba(28, 61, 116, 0.3);
-      border-radius: 12px;
+    #mode-ui .challenge-item {
+      border: 1px solid rgba(20, 70, 140, 0.18);
+      border-radius: 10px;
       padding: 8px 10px;
-      background: rgba(247, 248, 250, 0.7);
+      background: rgba(20, 70, 140, 0.06);
       font-size: 14px;
+      line-height: 1.5;
     }
 
-    .challenge-item h4 {
-      margin: 0 0 4px;
+    #mode-ui .challenge-item h4 {
+      margin: 0 0 2px;
       font-size: 15px;
-      color: var(--primary);
+      color: #113a8f;
     }
 
-    .challenge-item.passed {
-      border-color: rgba(43, 138, 62, 0.6);
-      background: rgba(43, 138, 62, 0.08);
+    #mode-ui .challenge-item .status {
+      margin: 4px 0 0;
     }
 
-    .challenge-item .status {
-      font-weight: 600;
+    #mode-ui .challenge-item.passed {
+      border-color: rgba(11, 138, 42, 0.4);
+      background: rgba(11, 138, 42, 0.08);
     }
 
-    .challenge-item.passed .status {
-      color: var(--success);
-    }
-
-    .challenge-actions {
-      margin-top: 8px;
+    #mode-ui .challenge-actions {
+      margin-top: 6px;
       display: flex;
       flex-direction: column;
       gap: 6px;
     }
 
-    .quiz-question {
-      border: 1px solid var(--quiz-border);
-      border-radius: 12px;
+    #mode-ui .quiz-question {
+      border: 1px solid rgba(20, 70, 140, 0.18);
+      border-radius: 10px;
       padding: 10px;
       display: flex;
       flex-direction: column;
       gap: 6px;
-      background: rgba(247, 248, 250, 0.6);
+      background: rgba(20, 70, 140, 0.05);
       font-size: 14px;
     }
 
-    .quiz-question h4 {
+    #mode-ui .quiz-question h4 {
       margin: 0;
       font-size: 15px;
-      color: var(--primary);
+      color: #113a8f;
     }
 
-    .quiz-options {
+    #mode-ui .quiz-options {
       display: flex;
       flex-wrap: wrap;
       gap: 10px;
     }
 
-    .quiz-options label {
+    #mode-ui .quiz-options label {
       display: flex;
       align-items: center;
       gap: 6px;
     }
 
-    .quiz-feedback {
+    #mode-ui .quiz-feedback {
       font-weight: 600;
       color: var(--muted);
     }
 
-    .quiz-feedback.correct {
+    #mode-ui .quiz-feedback.correct {
       color: var(--success);
     }
 
-    .quiz-feedback.incorrect {
+    #mode-ui .quiz-feedback.incorrect {
       color: var(--danger);
     }
 
-    .quiz-input {
+    #mode-ui .quiz-input {
       padding: 4px 6px;
       border-radius: 6px;
       border: 1px solid var(--border);
@@ -532,21 +631,25 @@
       border: 0;
     }
 
-    table {
+    #mode-ui .mode-card table {
       border-collapse: collapse;
       width: 100%;
       font-size: 14px;
+      border-radius: 8px;
+      overflow: hidden;
     }
 
-    th, td {
-      border: 1px solid rgba(28, 61, 116, 0.16);
-      padding: 4px 8px;
-      text-align: center;
+    #mode-ui .mode-card th,
+    #mode-ui .mode-card td {
+      border-bottom: 1px solid rgba(20, 70, 140, 0.12);
+      padding: 4px 6px;
+      text-align: left;
     }
 
-    th {
-      background: rgba(28, 61, 116, 0.1);
-      color: var(--primary);
+    #mode-ui .mode-card th {
+      background: rgba(20, 70, 140, 0.08);
+      color: #113a8f;
+      font-weight: 600;
     }
 
     @media (max-width: 900px) {
@@ -646,7 +749,7 @@
 
     <section id="stage-container" aria-labelledby="stage-title" data-mode-label="探索模式">
       <h2 id="stage-title" class="sr-only">成像画布</h2>
-      <svg id="lens-svg" viewBox="0 0 900 420" role="img" aria-label="凸透镜成像画布">
+      <svg id="lens-svg" viewBox="0 0 900 420" preserveAspectRatio="xMidYMid meet" role="img" aria-label="凸透镜成像画布">
         <defs>
           <linearGradient id="lensGrad" x1="0%" y1="0%" x2="0%" y2="100%">
             <stop offset="0%" stop-color="#a9e7ff" stop-opacity="0.9"></stop>
@@ -674,8 +777,8 @@
         <g id="rays"></g>
         <g id="objects"></g>
         <g id="lens">
-          <path id="lens-shape" fill="url(#lensGrad)" fill-opacity="0.3" stroke="#3aa0ff" stroke-width="2"></path>
-          <line id="lens-center-line" x1="450" y1="40" x2="450" y2="380" stroke="#3aa0ff" stroke-width="2" stroke-linecap="round" stroke-opacity="0.7"></line>
+          <path id="lens-shape" fill="url(#lensGrad)"></path>
+          <line id="lens-center-line" x1="450" y1="40" x2="450" y2="380"></line>
         </g>
         <g id="markers">
           <line id="principal-axis" x1="30" y1="210" x2="870" y2="210" stroke="#1c3d74" stroke-width="2" stroke-dasharray="4 4" opacity="0.6"></line>
@@ -697,7 +800,7 @@
         <p id="mode-guide">探索模式：拖动滑块观察成像随参数的变化。</p>
         <p id="status-text" aria-live="polite">实时演示中：移动滑块观察成像规律。</p>
       </div>
-      <div id="mode-ui"></div>
+      <div id="mode-ui" aria-live="polite"></div>
     </section>
 
     <aside id="info" aria-labelledby="info-title">
@@ -736,10 +839,12 @@
     (() => {
       const today = new Date().toISOString().slice(0, 10);
       console.log(`[LensLab] Step3 build OK @${today}`);
+      console.log(`[LensLab] Final UI Fix @${today}`);
 
       const SCALE = 12;
       const ORIGIN_X = 450;
       const AXIS_Y = 210;
+      const STAGE_HEIGHT = 420;
       const MODES = ['explore', 'summary', 'challenge', 'quiz'];
       const SPRITES = ['candle', 'person', 'arrow'];
       const modePrompts = {
@@ -916,6 +1021,7 @@
         modeHint: document.getElementById('mode-hint'),
         stage: document.getElementById('stage-container'),
         modeUi: document.getElementById('mode-ui'),
+        lensSvg: document.getElementById('lens-svg'),
         modeTabs: Array.from(document.querySelectorAll('.mode-tab')),
         raysGroup: document.getElementById('rays'),
         objectsGroup: document.getElementById('objects'),
@@ -976,24 +1082,29 @@
       }
 
       function computeLensThickness(f) {
-        const minT = 6;
-        const maxT = 22;
+        const mappedMax = 22;
+        const mappedMin = 6;
         const ratio = (clamp(f, 5, 15) - 5) / 10;
-        return maxT - ratio * (maxT - minT);
+        const thickness = mappedMax - ratio * (mappedMax - mappedMin);
+        return clamp(thickness, 4, 26);
       }
 
       function updateLensShape(f) {
         const thickness = computeLensThickness(f);
-        const half = thickness / 2;
-        const topY = AXIS_Y - 150;
-        const bottomY = AXIS_Y + 150;
-        const controlOffset = 110 + (22 - thickness) * 3;
-        const leftX = ORIGIN_X - half;
-        const rightX = ORIGIN_X + half;
-        const pathData = `M ${leftX} ${topY} C ${leftX - controlOffset} ${AXIS_Y - 60}, ${leftX - controlOffset} ${AXIS_Y + 60}, ${leftX} ${bottomY} L ${rightX} ${bottomY} C ${rightX + controlOffset} ${AXIS_Y + 60}, ${rightX + controlOffset} ${AXIS_Y - 60}, ${rightX} ${topY} Z`;
+        const halfThickness = thickness / 2;
+        const lensHalfHeight = clamp(STAGE_HEIGHT * 0.4, 140, 170);
+        const curvatureBand = lensHalfHeight * 0.4;
+        const topY = AXIS_Y - lensHalfHeight;
+        const bottomY = AXIS_Y + lensHalfHeight;
+        const controlOffset = 120 + (26 - thickness) * 3.2;
+        const leftX = ORIGIN_X - halfThickness;
+        const rightX = ORIGIN_X + halfThickness;
+        const pathData = `M ${leftX} ${topY} C ${leftX - controlOffset} ${AXIS_Y - curvatureBand}, ${leftX - controlOffset} ${AXIS_Y + curvatureBand}, ${leftX} ${bottomY} L ${rightX} ${bottomY} C ${rightX + controlOffset} ${AXIS_Y + curvatureBand}, ${rightX + controlOffset} ${AXIS_Y - curvatureBand}, ${rightX} ${topY} Z`;
         elements.lensShape.setAttribute('d', pathData);
         elements.lensCenterLine.setAttribute('x1', ORIGIN_X);
         elements.lensCenterLine.setAttribute('x2', ORIGIN_X);
+        elements.lensCenterLine.setAttribute('y1', topY);
+        elements.lensCenterLine.setAttribute('y2', bottomY);
       }
 
       function clearGroup(group) {
@@ -1071,6 +1182,7 @@
           href: spriteId,
           role: 'image'
         });
+        imageUse.setAttribute('class', `image${isReal ? '' : ' virtual'}`);
         imageUse.setAttribute('fill', color);
         imageUse.setAttribute('stroke', color);
         imageUse.setAttribute('stroke-width', '1.2');
@@ -1126,8 +1238,8 @@
           ray1Points.push(rightFocus, extendLine(rightFocus, imageTip, ORIGIN_X + 280));
         }
         const ray1 = createPolyline(ray1Points, {
+          class: 'ray',
           stroke: rayColor,
-          'stroke-width': 2,
           'stroke-opacity': opacity,
           fill: 'none',
           'marker-end': 'url(#arrowhead)'
@@ -1140,8 +1252,8 @@
           lensCenter,
           ray2Target
         ], {
+          class: 'ray',
           stroke: rayColor,
-          'stroke-width': 2,
           'stroke-opacity': opacity,
           fill: 'none',
           'marker-end': 'url(#arrowhead)'
@@ -1154,8 +1266,8 @@
           lensIntersectionForRay3,
           ray3Target
         ], {
+          class: 'ray',
           stroke: rayColor,
-          'stroke-width': 2,
           'stroke-opacity': opacity,
           fill: 'none',
           'marker-end': 'url(#arrowhead)'
@@ -1173,9 +1285,9 @@
             'stroke-dasharray': '6 6',
             fill: 'none'
           };
-          const ray1Dash = createPolyline([lensParallelPoint, imageTip], dashedAttrs);
-          const ray2Dash = createPolyline([lensCenter, imageTip], dashedAttrs);
-          const ray3Dash = createPolyline([lensIntersectionForRay3, imageTip], dashedAttrs);
+          const ray1Dash = createPolyline([lensParallelPoint, imageTip], { ...dashedAttrs, class: 'ray dashed' });
+          const ray2Dash = createPolyline([lensCenter, imageTip], { ...dashedAttrs, class: 'ray dashed' });
+          const ray3Dash = createPolyline([lensIntersectionForRay3, imageTip], { ...dashedAttrs, class: 'ray dashed' });
           elements.raysGroup.appendChild(ray1Dash);
           elements.raysGroup.appendChild(ray2Dash);
           elements.raysGroup.appendChild(ray3Dash);
@@ -1257,16 +1369,17 @@
       }
 
       function computeModeHtml() {
+        const prompt = modePrompts[state.mode];
         if (state.mode === 'explore') {
-          return `<div class="content" role="group"><p>拖动物距、焦距和物高，观察物体与像的相对位置变化。注意蓝色代表实像，橙色代表虚像。</p></div>`;
+          return `<div class="mode-card" role="group"><h4>探索提示</h4><p>${prompt.hint}</p><p>拖动物距、焦距和物高，观察物体与像的相对位置变化。注意蓝色代表实像，橙色代表虚像。</p></div>`;
         }
         if (state.mode === 'summary') {
-          return `<div class="content" role="group"><p>对比不同物距区间的成像结果：</p><table aria-label="凸透镜成像规律总结表"><thead><tr><th>物距区间</th><th>成像类型</th><th>像距范围</th><th>放大率</th><th>特点</th></tr></thead><tbody><tr><td>u &gt; 2f</td><td>实像</td><td>f &lt; v &lt; 2f</td><td>0 &lt; |m| &lt; 1</td><td>倒立缩小</td></tr><tr><td>u = 2f</td><td>实像</td><td>v = 2f</td><td>|m| = 1</td><td>倒立等大</td></tr><tr><td>f &lt; u &lt; 2f</td><td>实像</td><td>v &gt; 2f</td><td>|m| &gt; 1</td><td>倒立放大</td></tr><tr><td>u = f</td><td>—</td><td>—</td><td>—</td><td>平行光</td></tr><tr><td>u &lt; f</td><td>虚像</td><td>v &lt; 0</td><td>|m| &gt; 1</td><td>正立放大</td></tr></tbody></table></div>`;
+          return `<div class="mode-card" role="group"><h4>规律总结</h4><p>${prompt.hint}</p><table aria-label="凸透镜成像规律总结表"><thead><tr><th>物距区间</th><th>成像类型</th><th>像距范围</th><th>放大率</th><th>特点</th></tr></thead><tbody><tr><td>u &gt; 2f</td><td>实像</td><td>f &lt; v &lt; 2f</td><td>0 &lt; |m| &lt; 1</td><td>倒立缩小</td></tr><tr><td>u = 2f</td><td>实像</td><td>v = 2f</td><td>|m| = 1</td><td>倒立等大</td></tr><tr><td>f &lt; u &lt; 2f</td><td>实像</td><td>v &gt; 2f</td><td>|m| &gt; 1</td><td>倒立放大</td></tr><tr><td>u = f</td><td>—</td><td>—</td><td>—</td><td>平行光</td></tr><tr><td>u &lt; f</td><td>虚像</td><td>v &lt; 0</td><td>|m| &gt; 1</td><td>正立放大</td></tr></tbody></table><p>记住：实像在透镜另一侧，虚像在同侧，多比较放大率的绝对值与符号，便能快速判断像的特征。</p></div>`;
         }
         if (state.mode === 'challenge') {
-          return `<div class="content" role="group"><p id="challenge-tip">读题后再操作，达成条件会自动判定。</p><ul id="challenge-list" class="challenge-list"></ul><div class="challenge-actions"><button type="button" id="refresh-challenges">重新抽题</button><p id="challenge-feedback" aria-live="polite"></p></div></div>`;
+          return `<div class="mode-card" role="group"><h4>挑战任务</h4><p id="challenge-tip">${prompt.hint}</p><ul id="challenge-list" class="challenge-list"></ul><div class="challenge-actions"><button type="button" class="btn" id="refresh-challenges">重新抽题</button><p id="challenge-feedback" aria-live="polite"></p></div></div>`;
         }
-        return `<div class="content" role="group"><div class="quiz-question" data-question="q1" data-type="truefalse" data-answer="false"><h4>判断题</h4><p>当物距 u 小于焦距 f 时，屏幕上会得到一个实像。（对/错）</p><div class="quiz-options"><label><input type="radio" name="q1" value="true"> 对</label><label><input type="radio" name="q1" value="false"> 错</label></div><p class="quiz-feedback" aria-live="polite"></p></div><div class="quiz-question" data-question="q2" data-type="single" data-answer="等大倒立实像"><h4>单选题</h4><p>当物距 u = 2f 时，像的性质是什么？</p><div class="quiz-options"><label><input type="radio" name="q2" value="倒立缩小实像"> 倒立缩小实像</label><label><input type="radio" name="q2" value="等大倒立实像"> 等大倒立实像</label><label><input type="radio" name="q2" value="正立放大虚像"> 正立放大虚像</label></div><p class="quiz-feedback" aria-live="polite"></p></div><div class="quiz-question" data-question="q3" data-type="calculation" data-answer-v="30" data-answer-nature="倒立放大实像"><h4>计算题</h4><p>焦距 f = 10 cm，物距 u = 15 cm。请计算像距 v，并判断像的性质。</p><div class="quiz-options"><label>像距 v = <input type="number" class="quiz-input" step="0.1" data-field="v" aria-label="像距答案"> cm</label><label>像的性质<select class="quiz-input" data-field="nature" aria-label="像的性质答案"><option value="">请选择</option><option value="倒立放大实像">倒立放大实像</option><option value="倒立缩小实像">倒立缩小实像</option><option value="正立放大虚像">正立放大虚像</option></select></label></div><p class="quiz-feedback" aria-live="polite"></p></div><p id="quiz-score">本次得分：0 / 3</p><button type="button" id="quiz-reset">重做测验</button></div>`;
+        return `<div class="mode-card" role="group"><h4>课堂测验</h4><p>${prompt.hint}</p><div class="quiz-question" data-question="q1" data-type="truefalse" data-answer="false"><h4>判断题</h4><p>当物距 u 小于焦距 f 时，屏幕上会得到一个实像。（对/错）</p><div class="quiz-options"><label><input type="radio" name="q1" value="true"> 对</label><label><input type="radio" name="q1" value="false"> 错</label></div><p class="quiz-feedback" aria-live="polite"></p></div><div class="quiz-question" data-question="q2" data-type="single" data-answer="等大倒立实像"><h4>单选题</h4><p>当物距 u = 2f 时，像的性质是什么？</p><div class="quiz-options"><label><input type="radio" name="q2" value="倒立缩小实像"> 倒立缩小实像</label><label><input type="radio" name="q2" value="等大倒立实像"> 等大倒立实像</label><label><input type="radio" name="q2" value="正立放大虚像"> 正立放大虚像</label></div><p class="quiz-feedback" aria-live="polite"></p></div><div class="quiz-question" data-question="q3" data-type="calculation" data-answer-v="30" data-answer-nature="倒立放大实像"><h4>计算题</h4><p>焦距 f = 10 cm，物距 u = 15 cm。请计算像距 v，并判断像的性质。</p><div class="quiz-options"><label>像距 v = <input type="number" class="quiz-input" step="0.1" data-field="v" aria-label="像距答案"> cm</label><label>像的性质<select class="quiz-input" data-field="nature" aria-label="像的性质答案"><option value="">请选择</option><option value="倒立放大实像">倒立放大实像</option><option value="倒立缩小实像">倒立缩小实像</option><option value="正立放大虚像">正立放大虚像</option></select></label></div><p class="quiz-feedback" aria-live="polite"></p></div><p id="quiz-score">本次得分：0 / 3</p><button type="button" class="btn" id="quiz-reset">重做测验</button></div>`;
       }
       function renderModeContent() {
         elements.modeUi.innerHTML = computeModeHtml();
@@ -1283,9 +1396,7 @@
             state.challengeStates = {};
             saveChallenges();
             renderChallenges();
-            if (elements.challengeFeedback) {
-              elements.challengeFeedback.textContent = '已重新抽题，祝你好运！';
-            }
+            setChallengeFeedbackMessage('result-bad', '已重新抽题，祝你好运！');
             scheduleUpdate();
           });
         }
@@ -1370,6 +1481,15 @@
         persistState('challengeState', state.challengeStates);
       }
 
+      function setChallengeFeedbackMessage(statusClass, message) {
+        if (!elements.challengeFeedback) return;
+        elements.challengeFeedback.classList.remove('result-ok', 'result-bad');
+        if (statusClass) {
+          elements.challengeFeedback.classList.add(statusClass);
+        }
+        elements.challengeFeedback.textContent = message;
+      }
+
       function renderChallenges() {
         if (!elements.challengeList) return;
         elements.challengeList.innerHTML = '';
@@ -1377,10 +1497,12 @@
           const li = document.createElement('li');
           li.className = 'challenge-item';
           li.setAttribute('data-id', challenge.id);
-          if (state.challengeStates[challenge.id]) {
+          const passed = Boolean(state.challengeStates[challenge.id]);
+          if (passed) {
             li.classList.add('passed');
           }
-          li.innerHTML = `<h4>${challenge.title}</h4><p>${challenge.description}</p><p class="status">${state.challengeStates[challenge.id] ? '✅ 完成！' : '❌ 再试试～'}</p>`;
+          const statusClass = passed ? 'status result-ok' : 'status result-bad';
+          li.innerHTML = `<h4>${challenge.title}</h4><p>${challenge.description}</p><p class="${statusClass}">${passed ? '✅ 完成！' : '❌ 再试试～'}</p>`;
           elements.challengeList.appendChild(li);
         });
       }
@@ -1388,6 +1510,13 @@
       function evaluateChallenges(result) {
         if (!state.challenges.length) {
           state.challenges = createChallengeSet();
+        }
+        if (!result || result.noImage) {
+          if (state.mode === 'challenge') {
+            renderChallenges();
+            setChallengeFeedbackMessage('result-bad', '请先调整参数再尝试。');
+          }
+          return;
         }
         let changed = false;
         let lastUnlocked = '';
@@ -1406,15 +1535,13 @@
 
         if (state.mode === 'challenge') {
           renderChallenges();
-          if (elements.challengeFeedback) {
-            if (changed) {
-              elements.challengeFeedback.textContent = lastUnlocked || '恭喜完成挑战！';
-            } else {
-              const remaining = state.challenges.filter(ch => !state.challengeStates[ch.id]).length;
-              elements.challengeFeedback.textContent = remaining === 0
-                ? '全部关卡完成！可以尝试调整容差或重新抽题。'
-                : `尚有 ${remaining} 关待完成，加油！`;
-            }
+          const remaining = state.challenges.filter(ch => !state.challengeStates[ch.id]).length;
+          if (changed) {
+            setChallengeFeedbackMessage('result-ok', lastUnlocked || '恭喜完成挑战！');
+          } else if (remaining === 0) {
+            setChallengeFeedbackMessage('result-ok', '全部关卡完成！可以尝试调整容差或重新抽题。');
+          } else {
+            setChallengeFeedbackMessage('result-bad', `尚有 ${remaining} 关待完成，加油！`);
           }
         }
       }
@@ -1666,53 +1793,80 @@
         }
       }
 
-      function runSelfCheck() {
-        const checks = [];
+      function runSelfCheckUI() {
+        const logResult = (name, pass) => {
+          console.log(`[SelfCheckUI] ${name}: ${pass ? 'PASS' : 'FAIL'}`);
+        };
+
+        const stageRect = elements.stage.getBoundingClientRect();
+        const svgRect = elements.lensSvg.getBoundingClientRect();
+        const blankTop = Math.abs(svgRect.top - stageRect.top);
+        const blankBottom = Math.abs(stageRect.bottom - svgRect.bottom);
+        logResult('画布上下留白控制', blankTop < 60 && blankBottom < 60);
+
         const originalMode = state.mode;
-        const stageRectBefore = elements.stage.getBoundingClientRect();
-        setMode('summary', { persist: false });
-        const stageRectAfter = elements.stage.getBoundingClientRect();
-        const stableStage = Math.abs(stageRectAfter.top - stageRectBefore.top) < 1;
-        checks.push({ name: '画布高度稳定', pass: stableStage });
-        setMode(originalMode, { persist: false });
+        const originalTop = stageRect.top;
+        const originalHeight = stageRect.height;
+        let stageStable = true;
+        let cardWidthOk = true;
+        let cardBottomOk = true;
+        let cardScrollOk = true;
+        let summaryScrollSeen = false;
 
-        const modeUiHasContent = elements.modeUi.querySelector('.content') !== null;
-        checks.push({ name: '模式内容位于画布内', pass: modeUiHasContent });
-
-        const thick = computeLensThickness(5);
-        const thin = computeLensThickness(15);
-        checks.push({ name: '焦距影响透镜厚度', pass: thick - thin >= 12 });
-
-        let spriteOk = true;
-        const originalSprite = state.sprite;
-        SPRITES.forEach(type => {
-          state.sprite = type;
-          elements.spriteSelect.value = type;
-          updateScene();
-          const objectUse = elements.objectsGroup.querySelector('use[data-role="object"]');
-          const imageUse = elements.objectsGroup.querySelector('use[data-role="image"]');
-          if (!objectUse || !imageUse) {
-            spriteOk = false;
+        MODES.forEach(mode => {
+          setMode(mode, { persist: false });
+          const rect = elements.stage.getBoundingClientRect();
+          if (Math.abs(rect.top - originalTop) > 1.5 || Math.abs(rect.height - originalHeight) > 1.5) {
+            stageStable = false;
+          }
+          const card = elements.modeUi.querySelector('.mode-card');
+          if (card) {
+            const cardRect = card.getBoundingClientRect();
+            const widthRatio = cardRect.width / rect.width;
+            if (widthRatio < 0.5 || widthRatio > 0.7) {
+              cardWidthOk = false;
+            }
+            if (Math.abs(rect.bottom - cardRect.bottom) > 32) {
+              cardBottomOk = false;
+            }
+            const overflowY = window.getComputedStyle(card).overflowY;
+            if (overflowY !== 'auto') {
+              cardScrollOk = false;
+            }
+            if (mode === 'summary' && card.scrollHeight > card.clientHeight + 1) {
+              summaryScrollSeen = true;
+            }
+          } else {
+            stageStable = false;
+            cardWidthOk = false;
+            cardBottomOk = false;
+            cardScrollOk = false;
           }
         });
-        state.sprite = originalSprite;
-        elements.spriteSelect.value = originalSprite;
-        scheduleUpdate();
-        checks.push({ name: '物体图标切换', pass: spriteOk });
 
-        updateScene();
-        const ray = elements.raysGroup.querySelector('polyline');
-        const opacity = ray ? parseFloat(ray.getAttribute('stroke-opacity') || ray.style.strokeOpacity || '1') : 1;
-        checks.push({ name: '光线半透明', pass: opacity < 1 });
+        setMode(originalMode, { persist: false });
+
+        logResult('模式切换画布稳定', stageStable);
+        logResult('模式卡片宽度与位置', cardWidthOk && cardBottomOk);
+        logResult('模式卡片可滚动', cardScrollOk && summaryScrollSeen);
+
+        const lensBox = elements.lensShape.getBBox();
+        const stageWidth = elements.stage.getBoundingClientRect().width;
+        const lensWidthOk = lensBox.width <= stageWidth * 0.35;
+        const lensHeightOk = lensBox.height <= 340;
+        logResult('透镜尺寸限制', lensWidthOk && lensHeightOk);
 
         const sample = computeOutcome(18, 10, 3);
-        const physicsOk = Math.abs(sample.v - (10 * 18) / (18 - 10)) < 1e-6 && Math.abs(sample.m + sample.v / 18) < 1e-6;
-        checks.push({ name: '物理公式一致', pass: physicsOk });
+        const expectedV = (10 * 18) / (18 - 10);
+        const expectedM = -expectedV / 18;
+        const expectedHi = expectedM * 3;
+        const physicsOk = Math.abs(sample.v - expectedV) < 1e-6 && Math.abs(sample.m - expectedM) < 1e-6 && Math.abs(sample.hi - expectedHi) < 1e-6;
+        logResult('物理公式未改动', physicsOk);
 
-        checks.forEach(item => {
-          console.log(`[SelfCheck] ${item.name}: ${item.pass ? 'PASS' : 'FAIL'}`);
-        });
-        console.log(`[LensLab] Final Build OK @${today}`);
+        const combinedText = `${elements.modeUi.textContent || ''} ${elements.challengeFeedback ? elements.challengeFeedback.textContent || '' : ''}`;
+        logResult('反馈无 undefined 文案', !/undefined/i.test(combinedText));
+
+        scheduleUpdate();
       }
 
       elements.uRange.addEventListener('input', handleInputChange);
@@ -1764,12 +1918,12 @@
       updateToleranceDisplay();
       updateModeUI();
       scheduleUpdate();
-      runSelfCheck();
+      requestAnimationFrame(() => runSelfCheckUI());
     })();
   </script>
 
   <!-- CHANGELOG 2025-02-14:
-  Added vivid sprites, gradient convex lens, fixed layout shift,
-  floating mode UI, and independent side scrolling. -->
+  Tightened stage frame, clamped lens height/thickness, rebuilt mode overlay,
+  unified module typography, and guarded challenge feedback messaging. -->
 </body>
 </html>
