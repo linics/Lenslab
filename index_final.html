@@ -1,0 +1,1781 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>凸透镜成像虚拟实验课（Step 3）</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --bg-color: #f7f8fa;
+      --card-bg: #ffffff;
+      --primary: #1c3d74;
+      --primary-soft: rgba(28, 61, 116, 0.1);
+      --text: #2a2a2a;
+      --muted: #6c7a89;
+      --real: #1c7ed6;
+      --virtual: #f08c00;
+      --danger: #d9480f;
+      --success: #2b8a3e;
+      --quiz-border: rgba(28, 61, 116, 0.2);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+      background: var(--bg-color);
+      color: var(--text);
+      line-height: 1.6;
+      font-size: 16px;
+    }
+
+    header,
+    footer {
+      background: #ffffff;
+      border-bottom: 1px solid rgba(28, 61, 116, 0.12);
+      padding: 16px 24px;
+      box-shadow: 0 2px 8px rgba(28, 61, 116, 0.08);
+    }
+
+    footer {
+      border-bottom: none;
+      border-top: 1px solid rgba(28, 61, 116, 0.12);
+      box-shadow: 0 -2px 8px rgba(28, 61, 116, 0.08);
+      text-align: center;
+      font-size: 15px;
+      color: var(--muted);
+    }
+
+    header h1 {
+      margin: 0;
+      font-size: 26px;
+      color: var(--primary);
+      letter-spacing: 0.5px;
+    }
+
+    header p {
+      margin: 6px 0 0;
+      color: var(--muted);
+    }
+
+    main {
+      display: grid;
+      gap: 20px;
+      padding: 20px 24px 32px;
+      grid-template-columns: minmax(260px, 320px) 1fr minmax(280px, 340px);
+      min-height: calc(100vh - 160px);
+    }
+
+    section {
+      background: var(--card-bg);
+      border-radius: 16px;
+      box-shadow: 0 8px 24px rgba(28, 61, 116, 0.12);
+      padding: 20px 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    #controls h2,
+    #info h2,
+    #stage h2 {
+      margin: 0;
+      font-size: 20px;
+      color: var(--primary);
+    }
+
+    #controls .hint {
+      margin: -4px 0 4px;
+      color: var(--muted);
+      font-size: 15px;
+    }
+
+    .control-item {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      padding: 14px;
+      border: 1px solid rgba(28, 61, 116, 0.12);
+      border-radius: 12px;
+      background: rgba(247, 248, 250, 0.7);
+    }
+
+    .control-item label {
+      font-weight: 600;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 17px;
+      gap: 12px;
+    }
+
+    .control-item output {
+      min-width: 90px;
+      text-align: right;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .control-item input[type="range"] {
+      width: 100%;
+      accent-color: var(--primary);
+    }
+
+    .helper {
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .toggle-wrapper {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px;
+      border: 1px solid rgba(28, 61, 116, 0.12);
+      border-radius: 12px;
+      background: rgba(247, 248, 250, 0.7);
+      font-weight: 600;
+      font-size: 17px;
+      gap: 12px;
+    }
+
+    .switch {
+      position: relative;
+      width: 52px;
+      height: 26px;
+    }
+
+    .switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: rgba(28, 61, 116, 0.25);
+      transition: 0.3s;
+      border-radius: 24px;
+    }
+
+    .slider::before {
+      position: absolute;
+      content: "";
+      height: 20px;
+      width: 20px;
+      left: 3px;
+      bottom: 3px;
+      background-color: white;
+      transition: 0.3s;
+      border-radius: 50%;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+    }
+
+    .switch input:checked + .slider {
+      background-color: rgba(28, 61, 116, 0.6);
+    }
+
+    .switch input:checked + .slider::before {
+      transform: translateX(26px);
+    }
+
+    #stage {
+      position: relative;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 24px;
+      overflow: hidden;
+    }
+
+    #stage h2 {
+      align-self: flex-start;
+    }
+
+    #mode-tabs {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-top: 4px;
+    }
+
+    .mode-tab {
+      border: none;
+      background: rgba(28, 61, 116, 0.12);
+      color: var(--primary);
+      padding: 8px 16px;
+      border-radius: 999px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.2s;
+    }
+
+    .mode-tab[aria-selected="true"],
+    .mode-tab.active {
+      background: var(--primary);
+      color: #ffffff;
+      transform: translateY(-1px);
+    }
+
+    .mode-tab:focus {
+      outline: 2px solid var(--primary);
+      outline-offset: 2px;
+    }
+
+    #stage svg {
+      width: 100%;
+      max-width: 900px;
+      height: auto;
+      border-radius: 12px;
+      background-image: linear-gradient(180deg, rgba(255, 255, 255, 0.95), rgba(235, 240, 250, 0.9));
+      box-shadow: inset 0 0 0 1px rgba(28, 61, 116, 0.12);
+    }
+
+    body.teacher-mode #stage svg {
+      background-image:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.9), rgba(230, 237, 250, 0.9)),
+        linear-gradient(0deg, rgba(28, 61, 116, 0.12) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(28, 61, 116, 0.12) 1px, transparent 1px);
+      background-size: cover, 40px 40px, 40px 40px;
+    }
+
+    #stage::after {
+      content: attr(data-mode-text);
+      position: absolute;
+      top: 12px;
+      right: 24px;
+      font-weight: 600;
+      font-size: 15px;
+      color: rgba(28, 61, 116, 0.6);
+    }
+
+    #mode-guide {
+      margin: 4px 0 0;
+      font-size: 16px;
+      color: var(--muted);
+    }
+
+    #status-text {
+      margin: 4px 0 0;
+      font-size: 18px;
+      color: var(--muted);
+    }
+
+    #status-text.warning {
+      color: var(--danger);
+      font-weight: 600;
+    }
+
+    #status-text.positive {
+      color: var(--success);
+      font-weight: 600;
+    }
+
+    .info-card {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      padding: 16px;
+      border-radius: 14px;
+      background: rgba(255, 255, 255, 0.92);
+      box-shadow: inset 0 0 0 1px rgba(28, 61, 116, 0.08);
+    }
+
+    .info-card h3 {
+      margin: 0;
+      font-size: 18px;
+      color: var(--primary);
+    }
+
+    .info-list {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      color: var(--text);
+    }
+
+    .info-list li {
+      display: flex;
+      justify-content: space-between;
+      font-variant-numeric: tabular-nums;
+      font-weight: 500;
+    }
+
+    .info-list li span.label {
+      color: var(--muted);
+      font-weight: 600;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2px 10px;
+      border-radius: 999px;
+      font-size: 14px;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      background: var(--primary-soft);
+      color: var(--primary);
+      margin-right: 6px;
+    }
+
+    .badge.real {
+      background: rgba(28, 126, 214, 0.15);
+      color: var(--real);
+    }
+
+    .badge.virtual {
+      background: rgba(240, 140, 0, 0.18);
+      color: var(--virtual);
+    }
+
+    #image-nature {
+      margin: 0;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+    }
+
+    #image-nature span {
+      font-weight: 600;
+    }
+
+    .mode-card {
+      display: none;
+    }
+
+    .mode-card.active {
+      display: flex;
+    }
+
+    .mode-card table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 15px;
+    }
+
+    .mode-card th,
+    .mode-card td {
+      border: 1px solid rgba(28, 61, 116, 0.16);
+      padding: 6px 10px;
+      text-align: center;
+    }
+
+    .mode-card th {
+      background: rgba(28, 61, 116, 0.08);
+      color: var(--primary);
+    }
+
+    .challenge-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .challenge-item {
+      border: 1px dashed rgba(28, 61, 116, 0.3);
+      border-radius: 12px;
+      padding: 10px 12px;
+      text-align: left;
+      position: relative;
+      background: rgba(247, 248, 250, 0.6);
+    }
+
+    .challenge-item h4 {
+      margin: 0 0 4px;
+      font-size: 16px;
+      color: var(--primary);
+    }
+
+    .challenge-item p {
+      margin: 4px 0;
+      font-size: 15px;
+    }
+
+    .challenge-item .status {
+      font-weight: 600;
+      color: var(--danger);
+    }
+
+    .challenge-item.passed {
+      border-color: rgba(43, 138, 62, 0.6);
+      background: rgba(43, 138, 62, 0.08);
+    }
+
+    .challenge-item.passed .status {
+      color: var(--success);
+    }
+
+    .challenge-actions {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    button {
+      background: var(--primary);
+      color: #ffffff;
+      border: none;
+      border-radius: 999px;
+      padding: 10px 18px;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      align-self: flex-start;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    button:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 6px 12px rgba(28, 61, 116, 0.18);
+    }
+
+    button:focus {
+      outline: 2px solid rgba(28, 61, 116, 0.5);
+      outline-offset: 2px;
+    }
+
+    .dev-only {
+      display: none;
+      border: 1px dashed rgba(28, 61, 116, 0.4);
+      background: rgba(28, 61, 116, 0.06);
+      color: var(--primary);
+      padding: 10px 14px;
+      border-radius: 10px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    body.dev-mode .dev-only {
+      display: inline-flex;
+      align-self: flex-end;
+    }
+
+    .teacher-only {
+      display: none;
+    }
+
+    body.teacher-mode .teacher-only {
+      display: flex;
+    }
+
+    #focus-markers {
+      display: none;
+    }
+
+    body.teacher-mode #focus-markers {
+      display: block;
+    }
+
+    .ray-label {
+      font-size: 18px;
+      font-weight: 700;
+      fill: rgba(28, 61, 116, 0.9);
+      text-shadow: 0 1px 2px rgba(255, 255, 255, 0.7);
+    }
+
+    .quiz-question {
+      border: 1px solid var(--quiz-border);
+      border-radius: 12px;
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      background: rgba(247, 248, 250, 0.6);
+    }
+
+    .quiz-question h4 {
+      margin: 0;
+      font-size: 16px;
+      color: var(--primary);
+    }
+
+    .quiz-options {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .quiz-options label {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-weight: 500;
+    }
+
+    .quiz-feedback {
+      font-weight: 600;
+      color: var(--muted);
+      min-height: 20px;
+    }
+
+    .quiz-feedback.correct {
+      color: var(--success);
+    }
+
+    .quiz-feedback.incorrect {
+      color: var(--danger);
+    }
+
+    .quiz-input {
+      border: 1px solid rgba(28, 61, 116, 0.3);
+      border-radius: 8px;
+      padding: 6px 10px;
+      font-size: 15px;
+      min-width: 120px;
+    }
+
+    @media (max-width: 1100px) {
+      main {
+        grid-template-columns: minmax(240px, 300px) 1fr;
+        grid-template-areas:
+          "controls stage"
+          "info info";
+      }
+
+      #controls {
+        grid-area: controls;
+      }
+
+      #stage {
+        grid-area: stage;
+      }
+
+      #info {
+        grid-area: info;
+      }
+    }
+
+    @media (max-width: 768px) {
+      main {
+        grid-template-columns: 1fr;
+      }
+
+      section {
+        padding: 18px;
+      }
+
+      header,
+      footer {
+        padding: 14px 18px;
+      }
+
+      header h1 {
+        font-size: 24px;
+      }
+
+      body {
+        font-size: 17px;
+      }
+
+      #stage::after {
+        display: none;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>凸透镜成像虚拟实验课（Convex Lens Imaging Lab）</h1>
+    <p>Step 3：探索 · 总结 · 挑战 · 测验，一站式课堂体验</p>
+  </header>
+
+  <main>
+    <section id="controls" aria-labelledby="controls-title">
+      <h2 id="controls-title">调节区</h2>
+      <p class="hint" id="mode-hint">拖动滑块看看会发生什么～</p>
+
+      <div class="control-item">
+        <label for="u-range"><span>物距 <strong>u</strong></span><output id="u-display" for="u-range">18.0 cm</output></label>
+        <input id="u-range" type="range" min="5" max="30" step="0.1" value="18" aria-describedby="u-helper">
+        <small id="u-helper" class="helper">范围：5–30 cm</small>
+      </div>
+
+      <div class="control-item">
+        <label for="f-range"><span>焦距 <strong>f</strong></span><output id="f-display" for="f-range">10.0 cm</output></label>
+        <input id="f-range" type="range" min="5" max="15" step="0.1" value="10" aria-describedby="f-helper">
+        <small id="f-helper" class="helper">范围：5–15 cm</small>
+      </div>
+
+      <div class="control-item">
+        <label for="ho-range"><span>物高 <strong>ho</strong></span><output id="ho-display" for="ho-range">3.0 cm</output></label>
+        <input id="ho-range" type="range" min="1" max="5" step="0.1" value="3" aria-describedby="ho-helper">
+        <small id="ho-helper" class="helper">范围：1–5 cm</small>
+      </div>
+
+      <div class="toggle-wrapper" role="group" aria-label="光线显示切换">
+        <span>显示三条主光线</span>
+        <label class="switch" aria-label="显示或隐藏光线">
+          <input id="show-rays" type="checkbox" checked>
+          <span class="slider" aria-hidden="true"></span>
+        </label>
+      </div>
+
+      <div class="toggle-wrapper" role="group" aria-label="教师模式切换">
+        <span>教师模式</span>
+        <label class="switch" aria-label="开启或关闭教师模式">
+          <input id="teacher-mode-toggle" type="checkbox">
+          <span class="slider" aria-hidden="true"></span>
+        </label>
+      </div>
+
+      <div class="control-item teacher-only" id="tolerance-control">
+        <label for="tol-range"><span>判定容差 <strong>TOL</strong></span><output id="tol-display" for="tol-range">±0.5 cm</output></label>
+        <input id="tol-range" type="range" min="0.1" max="1" step="0.1" value="0.5" aria-describedby="tol-helper">
+        <small id="tol-helper" class="helper">范围：0.1–1.0 cm，可影响挑战判定严格程度</small>
+      </div>
+
+      <button type="button" id="self-test" class="dev-only">运行自检（开发专用）</button>
+    </section>
+
+    <section id="stage" aria-labelledby="stage-title" data-mode-text="探索模式">
+      <h2 id="stage-title">成像画布</h2>
+      <nav id="mode-tabs" role="tablist" aria-label="模式切换">
+        <button type="button" class="mode-tab" role="tab" aria-selected="true" data-mode="explore">探索</button>
+        <button type="button" class="mode-tab" role="tab" aria-selected="false" data-mode="summary">规律总结</button>
+        <button type="button" class="mode-tab" role="tab" aria-selected="false" data-mode="challenge">挑战</button>
+        <button type="button" class="mode-tab" role="tab" aria-selected="false" data-mode="quiz">测验</button>
+      </nav>
+      <svg id="lens-svg" viewBox="0 0 900 420" role="img" aria-label="凸透镜成像画布">
+        <defs>
+          <marker id="arrow-head" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto" markerUnits="strokeWidth">
+            <path d="M0,0 L10,5 L0,10 z" fill="currentColor"></path>
+          </marker>
+          <marker id="ray-arrow" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto" markerUnits="strokeWidth">
+            <path d="M0,0 L10,5 L0,10 z" fill="currentColor"></path>
+          </marker>
+        </defs>
+        <rect x="0" y="0" width="900" height="420" fill="transparent"></rect>
+        <line x1="30" y1="210" x2="870" y2="210" stroke="#1c3d74" stroke-width="2" stroke-dasharray="4 4" opacity="0.6"></line>
+        <line x1="450" y1="40" x2="450" y2="380" stroke="#1c3d74" stroke-width="4" stroke-linecap="round" opacity="0.8"></line>
+        <g id="focus-markers" fill="none" stroke="#1c3d74" stroke-width="2" opacity="0.75">
+          <line id="left-2f" x1="210" y1="190" x2="210" y2="230"></line>
+          <text id="left-2f-label" x="210" y="250" text-anchor="middle" font-size="16" fill="#1c3d74">2F</text>
+          <line id="left-f" x1="330" y1="190" x2="330" y2="230"></line>
+          <text id="left-f-label" x="330" y="250" text-anchor="middle" font-size="16" fill="#1c3d74">F</text>
+          <line id="right-f" x1="570" y1="190" x2="570" y2="230"></line>
+          <text id="right-f-label" x="570" y="250" text-anchor="middle" font-size="16" fill="#1c3d74">F</text>
+          <line id="right-2f" x1="690" y1="190" x2="690" y2="230"></line>
+          <text id="right-2f-label" x="690" y="250" text-anchor="middle" font-size="16" fill="#1c3d74">2F</text>
+        </g>
+        <g id="objects"></g>
+        <g id="rays"></g>
+        <g id="ray-labels"></g>
+      </svg>
+      <p id="mode-guide">探索模式：拖动滑块观察成像随参数的变化。</p>
+      <p id="status-text" aria-live="polite">实时演示中：移动滑块观察成像规律。</p>
+    </section>
+
+    <section id="info" aria-labelledby="info-title">
+      <h2 id="info-title">信息面板</h2>
+      <div class="info-card" aria-live="polite">
+        <h3>当前参数</h3>
+        <ul class="info-list">
+          <li><span class="label">物距 u</span><span id="info-u">18.0 cm</span></li>
+          <li><span class="label">焦距 f</span><span id="info-f">10.0 cm</span></li>
+          <li><span class="label">物高 ho</span><span id="info-ho">3.0 cm</span></li>
+        </ul>
+      </div>
+      <div class="info-card" aria-live="polite">
+        <h3>成像结果</h3>
+        <p id="result-summary">像距 v：__ cm｜放大率 m：__｜像高 hi：__ cm</p>
+        <p id="image-nature">
+          <span class="badge" id="nature-type">待计算</span>
+          <span id="orientation-text">—</span>
+          <span id="scale-text">—</span>
+        </p>
+      </div>
+      <div class="info-card">
+        <h3>教学提示</h3>
+        <p id="teaching-tip">观察不同物距下的像距与像的性质，尝试总结规律～</p>
+      </div>
+
+      <div class="info-card mode-card active" data-mode="explore">
+        <h3>探索模式助手</h3>
+        <p>随时关注蓝色（实像）与橙色（虚像）箭头的变化，体会物距、像距、放大率之间的关系。</p>
+        <p>需要示范作图时可开启教师模式，出现焦点、2F 标记与作图步骤编号。</p>
+      </div>
+
+      <div class="info-card mode-card" data-mode="summary">
+        <h3>规律总结表</h3>
+        <p>对比不同物距区间的成像结果，尝试用自己的话概括规律。</p>
+        <table aria-label="凸透镜成像规律总结表">
+          <thead>
+            <tr>
+              <th>物距区间</th>
+              <th>成像类型</th>
+              <th>像距范围</th>
+              <th>放大率</th>
+              <th>像的特点</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>u &gt; 2f</td>
+              <td>实像</td>
+              <td>f &lt; v &lt; 2f</td>
+              <td>0 &lt; |m| &lt; 1</td>
+              <td>倒立、缩小</td>
+            </tr>
+            <tr>
+              <td>u = 2f</td>
+              <td>实像</td>
+              <td>v = 2f</td>
+              <td>|m| = 1</td>
+              <td>倒立、等大</td>
+            </tr>
+            <tr>
+              <td>f &lt; u &lt; 2f</td>
+              <td>实像</td>
+              <td>v &gt; 2f</td>
+              <td>|m| &gt; 1</td>
+              <td>倒立、放大</td>
+            </tr>
+            <tr>
+              <td>u = f</td>
+              <td>—</td>
+              <td>—</td>
+              <td>—</td>
+              <td>平行光，不成像</td>
+            </tr>
+            <tr>
+              <td>u &lt; f</td>
+              <td>虚像</td>
+              <td>v &lt; 0</td>
+              <td>|m| &gt; 1</td>
+              <td>正立、放大（放大镜）</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="info-card mode-card" data-mode="challenge">
+        <h3>挑战关卡</h3>
+        <p id="challenge-tip">读题后再操作，达成条件会自动判定。</p>
+        <ul id="challenge-list" class="challenge-list"></ul>
+        <div class="challenge-actions">
+          <button type="button" id="refresh-challenges">重新抽题</button>
+          <p id="challenge-feedback" aria-live="polite"></p>
+        </div>
+      </div>
+
+      <div class="info-card mode-card" data-mode="quiz">
+        <h3>课堂小测验</h3>
+        <p>作答后立即看到结果与解析，可随时重做。</p>
+        <div class="quiz-question" data-question="q1" data-type="truefalse" data-answer="false">
+          <h4>判断题</h4>
+          <p>当物距 u 小于焦距 f 时，屏幕上会得到一个实像。（对/错）</p>
+          <div class="quiz-options">
+            <label><input type="radio" name="q1" value="true"> 对</label>
+            <label><input type="radio" name="q1" value="false"> 错</label>
+          </div>
+          <p class="quiz-feedback" aria-live="polite"></p>
+        </div>
+        <div class="quiz-question" data-question="q2" data-type="single" data-answer="等大倒立实像">
+          <h4>单选题</h4>
+          <p>当物距 u = 2f 时，像的性质是什么？</p>
+          <div class="quiz-options">
+            <label><input type="radio" name="q2" value="倒立缩小实像"> 倒立缩小实像</label>
+            <label><input type="radio" name="q2" value="等大倒立实像"> 等大倒立实像</label>
+            <label><input type="radio" name="q2" value="正立放大虚像"> 正立放大虚像</label>
+          </div>
+          <p class="quiz-feedback" aria-live="polite"></p>
+        </div>
+        <div class="quiz-question" data-question="q3" data-type="calculation" data-answer-v="30" data-answer-nature="倒立放大实像">
+          <h4>计算题</h4>
+          <p>焦距 f = 10 cm，物距 u = 15 cm。请计算像距 v，并判断像的性质。</p>
+          <div class="quiz-options">
+            <label>像距 v = <input type="number" class="quiz-input" step="0.1" data-field="v" aria-label="像距答案"> cm</label>
+            <label>像的性质
+              <select class="quiz-input" data-field="nature" aria-label="像的性质答案">
+                <option value="">请选择</option>
+                <option value="倒立放大实像">倒立放大实像</option>
+                <option value="倒立缩小实像">倒立缩小实像</option>
+                <option value="正立放大虚像">正立放大虚像</option>
+              </select>
+            </label>
+          </div>
+          <p class="quiz-feedback" aria-live="polite"></p>
+        </div>
+        <p id="quiz-score">本次得分：0 / 3</p>
+        <button type="button" id="quiz-reset">重做测验</button>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    © 2025 教育科技实验演示
+  </footer>
+
+  <script>
+    (() => {
+      const today = new Date().toISOString().slice(0, 10);
+      console.log(`[LensLab] Step3 build OK @${today}`);
+
+      const SCALE = 12;
+      const ORIGIN_X = 450;
+      const AXIS_Y = 210;
+      const MODES = ['explore', 'summary', 'challenge', 'quiz'];
+      const modePrompts = {
+        explore: {
+          hint: '拖动滑块看看会发生什么～',
+          guide: '探索模式：拖动滑块观察成像随参数的变化。',
+          badge: '探索模式'
+        },
+        summary: {
+          hint: '对比不同物距区间的规律，试着总结一句话～',
+          guide: '规律总结：观察表格，尝试口头描述成像规律。',
+          badge: '规律总结'
+        },
+        challenge: {
+          hint: '按照关卡要求调参，命中条件会提示成功。',
+          guide: '挑战模式：满足目标条件即可通关，调节范围受容差影响。',
+          badge: '挑战模式'
+        },
+        quiz: {
+          hint: '作答后立即反馈，看看能否满分！',
+          guide: '测验模式：完成判断、选择与计算题，立刻查看得分。',
+          badge: '测验模式'
+        }
+      };
+
+      const STORAGE_KEYS = {
+        u: 'lenslab_u',
+        f: 'lenslab_f',
+        ho: 'lenslab_ho',
+        showRays: 'lenslab_showRays',
+        teacherMode: 'lenslab_teacherMode',
+        tolerance: 'lenslab_tol',
+        mode: 'lenslab_mode',
+        challengeConfig: 'lenslab_challengeConfig',
+        challengeState: 'lenslab_challengeStates',
+        quizScore: 'lenslab_quizScore'
+      };
+
+      const state = {
+        u: 18,
+        f: 10,
+        ho: 3,
+        showRays: true,
+        teacherMode: false,
+        tolerance: 0.5,
+        mode: 'explore',
+        challenges: [],
+        challengeStates: {},
+        quizResults: {}
+      };
+
+      const supportsStorage = (() => {
+        try {
+          const testKey = '__lenslab_test__';
+          window.localStorage.setItem(testKey, '1');
+          window.localStorage.removeItem(testKey);
+          return true;
+        } catch (err) {
+          console.warn('[LensLab] localStorage 不可用，使用默认参数');
+          return false;
+        }
+      })();
+
+      function clamp(value, min, max) {
+        return Math.min(Math.max(value, min), max);
+      }
+
+      function formatNumber(value, digits = 1) {
+        return Number(value).toFixed(digits);
+      }
+
+      function persistState(key, value) {
+        if (!supportsStorage || !Object.prototype.hasOwnProperty.call(STORAGE_KEYS, key)) return;
+        if (typeof value === 'object') {
+          window.localStorage.setItem(STORAGE_KEYS[key], JSON.stringify(value));
+        } else {
+          window.localStorage.setItem(STORAGE_KEYS[key], String(value));
+        }
+      }
+
+      function loadPersistedState() {
+        if (!supportsStorage) return;
+        const savedU = parseFloat(window.localStorage.getItem(STORAGE_KEYS.u));
+        const savedF = parseFloat(window.localStorage.getItem(STORAGE_KEYS.f));
+        const savedHo = parseFloat(window.localStorage.getItem(STORAGE_KEYS.ho));
+        const savedShowRays = window.localStorage.getItem(STORAGE_KEYS.showRays);
+        const savedTeacher = window.localStorage.getItem(STORAGE_KEYS.teacherMode);
+        const savedTol = parseFloat(window.localStorage.getItem(STORAGE_KEYS.tolerance));
+        const savedMode = window.localStorage.getItem(STORAGE_KEYS.mode);
+        const savedChallenges = window.localStorage.getItem(STORAGE_KEYS.challengeConfig);
+        const savedChallengeState = window.localStorage.getItem(STORAGE_KEYS.challengeState);
+        const savedQuizScore = window.localStorage.getItem(STORAGE_KEYS.quizScore);
+
+        if (!Number.isNaN(savedU)) state.u = clamp(savedU, 5, 30);
+        if (!Number.isNaN(savedF)) state.f = clamp(savedF, 5, 15);
+        if (!Number.isNaN(savedHo)) state.ho = clamp(savedHo, 1, 5);
+        if (savedShowRays !== null) state.showRays = savedShowRays === 'true';
+        if (savedTeacher !== null) state.teacherMode = savedTeacher === 'true';
+        if (!Number.isNaN(savedTol)) state.tolerance = clamp(savedTol, 0.1, 1);
+        if (savedMode && MODES.includes(savedMode)) state.mode = savedMode;
+
+        if (savedChallenges) {
+          try {
+            const parsed = JSON.parse(savedChallenges);
+            if (Array.isArray(parsed)) {
+              state.challenges = parsed;
+            }
+          } catch (err) {
+            console.warn('[LensLab] 解析挑战配置失败，已重置。', err);
+          }
+        }
+
+        if (savedChallengeState) {
+          try {
+            const parsedState = JSON.parse(savedChallengeState);
+            if (parsedState && typeof parsedState === 'object') {
+              state.challengeStates = parsedState;
+            }
+          } catch (err) {
+            console.warn('[LensLab] 解析挑战状态失败。', err);
+          }
+        }
+
+        if (savedQuizScore) {
+          try {
+            const parsedScore = JSON.parse(savedQuizScore);
+            if (parsedScore && typeof parsedScore === 'object') {
+              state.quizResults = parsedScore;
+            }
+          } catch (err) {
+            console.warn('[LensLab] 解析测验得分失败。', err);
+          }
+        }
+      }
+
+      loadPersistedState();
+
+      const elements = {
+        uRange: document.getElementById('u-range'),
+        fRange: document.getElementById('f-range'),
+        hoRange: document.getElementById('ho-range'),
+        showRays: document.getElementById('show-rays'),
+        teacherToggle: document.getElementById('teacher-mode-toggle'),
+        tolRange: document.getElementById('tol-range'),
+        uDisplay: document.getElementById('u-display'),
+        fDisplay: document.getElementById('f-display'),
+        hoDisplay: document.getElementById('ho-display'),
+        tolDisplay: document.getElementById('tol-display'),
+        infoU: document.getElementById('info-u'),
+        infoF: document.getElementById('info-f'),
+        infoHo: document.getElementById('info-ho'),
+        resultSummary: document.getElementById('result-summary'),
+        natureType: document.getElementById('nature-type'),
+        orientationText: document.getElementById('orientation-text'),
+        scaleText: document.getElementById('scale-text'),
+        teachingTip: document.getElementById('teaching-tip'),
+        statusText: document.getElementById('status-text'),
+        modeGuide: document.getElementById('mode-guide'),
+        modeHint: document.getElementById('mode-hint'),
+        stage: document.getElementById('stage'),
+        objectsGroup: document.getElementById('objects'),
+        raysGroup: document.getElementById('rays'),
+        rayLabelsGroup: document.getElementById('ray-labels'),
+        focus: {
+          leftF: document.getElementById('left-f'),
+          leftFLabel: document.getElementById('left-f-label'),
+          left2F: document.getElementById('left-2f'),
+          left2FLabel: document.getElementById('left-2f-label'),
+          rightF: document.getElementById('right-f'),
+          rightFLabel: document.getElementById('right-f-label'),
+          right2F: document.getElementById('right-2f'),
+          right2FLabel: document.getElementById('right-2f-label')
+        },
+        modeTabs: Array.from(document.querySelectorAll('.mode-tab')),
+        modeCards: Array.from(document.querySelectorAll('.mode-card')),
+        challengeList: document.getElementById('challenge-list'),
+        challengeFeedback: document.getElementById('challenge-feedback'),
+        challengeTip: document.getElementById('challenge-tip'),
+        refreshChallenges: document.getElementById('refresh-challenges'),
+        quizQuestions: Array.from(document.querySelectorAll('.quiz-question')),
+        quizScore: document.getElementById('quiz-score'),
+        quizReset: document.getElementById('quiz-reset'),
+        selfTest: document.getElementById('self-test')
+      };
+
+      elements.uRange.value = state.u;
+      elements.fRange.value = state.f;
+      elements.hoRange.value = state.ho;
+      elements.showRays.checked = state.showRays;
+      elements.teacherToggle.checked = state.teacherMode;
+      elements.tolRange.value = state.tolerance;
+      elements.stage.dataset.modeText = modePrompts[state.mode].badge;
+
+      document.body.classList.toggle('teacher-mode', state.teacherMode);
+
+      let animationHandle = null;
+
+      function scheduleUpdate() {
+        if (animationHandle) {
+          cancelAnimationFrame(animationHandle);
+        }
+        animationHandle = requestAnimationFrame(updateScene);
+      }
+
+      function setMarker(line, label, x) {
+        line.setAttribute('x1', x);
+        line.setAttribute('x2', x);
+        label.setAttribute('x', x);
+      }
+
+      function setFocusMarkers(f) {
+        const leftF = ORIGIN_X - f * SCALE;
+        const rightF = ORIGIN_X + f * SCALE;
+        const left2F = ORIGIN_X - 2 * f * SCALE;
+        const right2F = ORIGIN_X + 2 * f * SCALE;
+        setMarker(elements.focus.leftF, elements.focus.leftFLabel, leftF);
+        setMarker(elements.focus.rightF, elements.focus.rightFLabel, rightF);
+        setMarker(elements.focus.left2F, elements.focus.left2FLabel, left2F);
+        setMarker(elements.focus.right2F, elements.focus.right2FLabel, right2F);
+      }
+
+      function clearGroups() {
+        elements.objectsGroup.innerHTML = '';
+        elements.raysGroup.innerHTML = '';
+        elements.rayLabelsGroup.innerHTML = '';
+      }
+
+      function createLine(attrs) {
+        const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+        Object.entries(attrs).forEach(([key, value]) => line.setAttribute(key, value));
+        return line;
+      }
+
+      function createPolyline(points, attrs = {}) {
+        const polyline = document.createElementNS('http://www.w3.org/2000/svg', 'polyline');
+        polyline.setAttribute('points', points.map(point => `${point.x},${point.y}`).join(' '));
+        Object.entries(attrs).forEach(([key, value]) => polyline.setAttribute(key, value));
+        return polyline;
+      }
+
+      function createText(x, y, textContent) {
+        const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+        text.setAttribute('x', x);
+        text.setAttribute('y', y);
+        text.setAttribute('text-anchor', 'middle');
+        text.setAttribute('class', 'ray-label');
+        text.textContent = textContent;
+        return text;
+      }
+
+      function updateInfoPanel({ v, m, hi }) {
+        elements.resultSummary.textContent = `像距 v：${formatNumber(v)} cm｜放大率 m：${formatNumber(m, 2)}｜像高 hi：${formatNumber(hi)} cm`;
+        const isReal = v > 0;
+        elements.natureType.textContent = isReal ? '实像' : '虚像';
+        elements.natureType.className = `badge ${isReal ? 'real' : 'virtual'}`;
+        const orientation = m < 0 ? '倒立' : '正立';
+        const absM = Math.abs(m);
+        let scaleText = '等大';
+        if (absM > 1.05) {
+          scaleText = '放大';
+        } else if (absM < 0.95) {
+          scaleText = '缩小';
+        }
+        elements.orientationText.textContent = `姿态：${orientation}`;
+        elements.scaleText.textContent = `大小：${scaleText}`;
+        elements.teachingTip.textContent = isReal
+          ? '蓝色像条表示实像，位于透镜右侧且常常倒立。试着改变物距观察放大率的增减！'
+          : '橙色像条表示虚像。虚像与物在同侧且正立放大，像在延长线上才能看到，就像放大镜。';
+      }
+
+      function updateStatusMessage(result) {
+        if (!result || result.noImage) {
+          elements.statusText.textContent = '接近平行光，不成像（光线将保持平行）';
+          elements.statusText.className = 'warning';
+          return;
+        }
+        const { v } = result;
+        const isReal = v > 0;
+        elements.statusText.textContent = isReal
+          ? '已成实像：可以在透镜另一侧屏幕上接收到倒立像。'
+          : '形成虚像：需要从透镜左侧回看，才能看到放大的正立像。';
+        elements.statusText.className = isReal ? 'positive' : '';
+      }
+
+      function setMode(mode, { persist = true } = {}) {
+        if (!MODES.includes(mode)) return;
+        state.mode = mode;
+        if (persist) {
+          persistState('mode', mode);
+        }
+        updateModeUI();
+      }
+
+      function updateModeUI() {
+        elements.modeTabs.forEach(tab => {
+          const isActive = tab.dataset.mode === state.mode;
+          tab.classList.toggle('active', isActive);
+          tab.setAttribute('aria-selected', isActive ? 'true' : 'false');
+          tab.setAttribute('tabindex', isActive ? '0' : '-1');
+        });
+
+        elements.modeCards.forEach(card => {
+          const isActive = card.dataset.mode === state.mode;
+          card.classList.toggle('active', isActive);
+        });
+
+        const prompt = modePrompts[state.mode];
+        elements.modeHint.textContent = prompt.hint;
+        elements.modeGuide.textContent = prompt.guide;
+        elements.stage.dataset.modeText = prompt.badge;
+      }
+
+      function renderObject(base, tip) {
+        const objectLine = createLine({
+          x1: base.x,
+          y1: base.y,
+          x2: tip.x,
+          y2: tip.y,
+          stroke: '#1c3d74',
+          'stroke-width': 4,
+          'stroke-linecap': 'round',
+          'marker-end': 'url(#arrow-head)'
+        });
+        const baseLine = createLine({
+          x1: base.x - 8,
+          y1: base.y,
+          x2: base.x + 8,
+          y2: base.y,
+          stroke: '#1c3d74',
+          'stroke-width': 3,
+          'stroke-linecap': 'round'
+        });
+        elements.objectsGroup.appendChild(objectLine);
+        elements.objectsGroup.appendChild(baseLine);
+      }
+
+      function renderImage(base, tip, v) {
+        const isReal = v > 0;
+        const color = isReal ? '#1c7ed6' : '#f08c00';
+        const imageLine = createLine({
+          x1: base.x,
+          y1: base.y,
+          x2: tip.x,
+          y2: tip.y,
+          stroke: color,
+          'stroke-width': 4,
+          'stroke-linecap': 'round',
+          'marker-end': 'url(#arrow-head)'
+        });
+        const baseLine = createLine({
+          x1: base.x - 8,
+          y1: base.y,
+          x2: base.x + 8,
+          y2: base.y,
+          stroke: color,
+          'stroke-width': 3,
+          'stroke-linecap': 'round'
+        });
+        elements.objectsGroup.appendChild(imageLine);
+        elements.objectsGroup.appendChild(baseLine);
+      }
+
+      function extendLine(pointA, pointB, targetX) {
+        const slope = (pointB.y - pointA.y) / (pointB.x - pointA.x);
+        const y = pointA.y + slope * (targetX - pointA.x);
+        return { x: targetX, y };
+      }
+
+      function lineIntersection(p1, p2, x) {
+        const t = (x - p1.x) / (p2.x - p1.x);
+        const y = p1.y + t * (p2.y - p1.y);
+        return { x, y };
+      }
+
+      function renderRayLabels(objectTip, lensParallelPoint, lensCenter, leftFocusPoint, imageTip, isReal) {
+        if (!state.teacherMode) return;
+        const mid = (a, b) => ({ x: (a.x + b.x) / 2, y: (a.y + b.y) / 2 });
+        const firstMid = mid(objectTip, lensParallelPoint);
+        const secondMid = mid(objectTip, lensCenter);
+        const thirdMid = mid(objectTip, leftFocusPoint);
+        const label1 = createText(firstMid.x + 6, firstMid.y - 18, '①');
+        const label2 = createText(secondMid.x + 10, secondMid.y - 18, '②');
+        const label3 = createText(thirdMid.x, thirdMid.y - 18, '③');
+        elements.rayLabelsGroup.appendChild(label1);
+        elements.rayLabelsGroup.appendChild(label2);
+        elements.rayLabelsGroup.appendChild(label3);
+
+        if (!isReal) {
+          const note = createText(imageTip.x + 50, imageTip.y - 20, '延长线观测');
+          note.setAttribute('font-size', '14');
+          elements.rayLabelsGroup.appendChild(note);
+        }
+      }
+
+      function renderRays(objectTip, v, f, imageTip) {
+        const isReal = v > 0;
+        const rayColor = isReal ? '#1c7ed6' : '#f08c00';
+        const leftFocus = { x: ORIGIN_X - f * SCALE, y: AXIS_Y };
+        const rightFocus = { x: ORIGIN_X + f * SCALE, y: AXIS_Y };
+        const lensParallelPoint = { x: ORIGIN_X, y: objectTip.y };
+        const lensCenter = { x: ORIGIN_X, y: AXIS_Y };
+
+        const ray1Points = [objectTip, lensParallelPoint, rightFocus];
+        if (isReal) {
+          ray1Points.push(imageTip);
+        } else {
+          ray1Points.push(extendLine(lensParallelPoint, rightFocus, ORIGIN_X + 260));
+        }
+        const ray1 = createPolyline(ray1Points, {
+          stroke: rayColor,
+          'stroke-width': 2.5,
+          fill: 'none',
+          'marker-end': 'url(#ray-arrow)'
+        });
+
+        const slopeCenter = (lensCenter.y - objectTip.y) / (lensCenter.x - objectTip.x);
+        const ray2Target = isReal
+          ? imageTip
+          : { x: ORIGIN_X + 260, y: lensCenter.y + slopeCenter * 260 };
+        const ray2 = createPolyline([
+          objectTip,
+          lensCenter,
+          ray2Target
+        ], {
+          stroke: rayColor,
+          'stroke-width': 2.5,
+          fill: 'none',
+          'marker-end': 'url(#ray-arrow)'
+        });
+
+        const lensIntersectionForRay3 = lineIntersection(objectTip, leftFocus, ORIGIN_X);
+        const ray3Target = isReal
+          ? imageTip
+          : { x: ORIGIN_X + 260, y: lensIntersectionForRay3.y };
+        const ray3 = createPolyline([
+          objectTip,
+          lensIntersectionForRay3,
+          ray3Target
+        ], {
+          stroke: rayColor,
+          'stroke-width': 2.5,
+          fill: 'none',
+          'marker-end': 'url(#ray-arrow)'
+        });
+
+        elements.raysGroup.appendChild(ray1);
+        elements.raysGroup.appendChild(ray2);
+        elements.raysGroup.appendChild(ray3);
+
+        if (!isReal) {
+          const dashedAttrs = {
+            stroke: rayColor,
+            'stroke-width': 1.5,
+            'stroke-dasharray': '6 6',
+            fill: 'none'
+          };
+          const ray1Dash = createPolyline([lensParallelPoint, imageTip], dashedAttrs);
+          const ray2Dash = createPolyline([lensCenter, imageTip], dashedAttrs);
+          const ray3Dash = createPolyline([lensIntersectionForRay3, imageTip], dashedAttrs);
+          elements.raysGroup.appendChild(ray1Dash);
+          elements.raysGroup.appendChild(ray2Dash);
+          elements.raysGroup.appendChild(ray3Dash);
+        }
+
+        renderRayLabels(objectTip, lensParallelPoint, lensCenter, lensIntersectionForRay3, imageTip, isReal);
+      }
+
+      function setNoImageState() {
+        elements.resultSummary.textContent = '像距 v：—｜放大率 m：—｜像高 hi：—';
+        elements.natureType.textContent = '平行光，不成像';
+        elements.natureType.className = 'badge';
+        elements.orientationText.textContent = '—';
+        elements.scaleText.textContent = '—';
+        elements.statusText.textContent = '接近平行光，不成像（光线将保持平行）';
+        elements.statusText.className = 'warning';
+        elements.teachingTip.textContent = '当物体位于焦点位置时，凸透镜会让光线变成平行光，无法在屏幕上成像。稍微移动物距试试～';
+      }
+
+      function computeOutcome(u, f, ho) {
+        if (Math.abs(u - f) < 0.1) {
+          return { noImage: true };
+        }
+        const v = (f * u) / (u - f);
+        const m = -v / u;
+        const hi = m * ho;
+        return { v, m, hi, noImage: false };
+      }
+
+      function createChallengeSet(existing) {
+        if (Array.isArray(existing) && existing.length >= 3) {
+          return existing;
+        }
+        const randomInRange = (min, max) => Math.round((min + Math.random() * (max - min)) * 10) / 10;
+        const baseF = randomInRange(8, 12);
+        const deltaLow = randomInRange(0.6, 1.2);
+        const deltaHigh = randomInRange(0.6, 1.2);
+        const minVMultiplier = randomInRange(2.2, 2.8);
+        const challengeA = {
+          id: 'A',
+          title: '关卡 A：倒立放大实像',
+          type: 'realMagnified',
+          params: {
+            targetF: baseF,
+            minU: baseF + deltaLow,
+            maxU: 2 * baseF - deltaHigh,
+            minV: minVMultiplier * baseF
+          }
+        };
+
+        const equalF = randomInRange(7, 11);
+        const challengeB = {
+          id: 'B',
+          title: '关卡 B：等大成像',
+          type: 'equalSize',
+          params: {
+            targetF: equalF
+          }
+        };
+
+        const magnifierF = randomInRange(6, 11);
+        const boost = randomInRange(1.4, 1.8);
+        const challengeC = {
+          id: 'C',
+          title: '关卡 C：放大镜模式',
+          type: 'magnifier',
+          params: {
+            targetF: magnifierF,
+            minMagnification: boost
+          }
+        };
+
+        return [challengeA, challengeB, challengeC];
+      }
+
+      state.challenges = createChallengeSet(state.challenges);
+
+      function saveChallenges() {
+        persistState('challengeConfig', state.challenges);
+        persistState('challengeState', state.challengeStates);
+      }
+
+      function describeChallenge(challenge) {
+        const { type, params, title } = challenge;
+        if (type === 'realMagnified') {
+          const { targetF, minU, maxU, minV } = params;
+          return {
+            title,
+            detail: `将焦距调到约 ${formatNumber(targetF)} cm（允许 ±TOL），并把物距控制在 ${formatNumber(minU)}～${formatNumber(maxU)} cm 之间，使像距超过 ${formatNumber(minV)} cm。`,
+            hint: '提示：物距略大于焦距时，像会远离透镜并放大。'
+          };
+        }
+        if (type === 'equalSize') {
+          const { targetF } = params;
+          return {
+            title,
+            detail: `将焦距设置在 ${formatNumber(targetF)} cm 附近（±TOL），调节物距使其约等于 2f，观察像距是否也约等于 2f。`,
+            hint: '提示：物距 2f 时，像与物一样大且倒立。'
+          };
+        }
+        const { targetF, minMagnification } = params;
+        return {
+          title,
+          detail: `将焦距靠近 ${formatNumber(targetF)} cm，保持物体在焦点内侧（u < f），让放大率达到 ${formatNumber(minMagnification, 2)} 以上并得到虚像。`,
+          hint: '提示：物距比焦距略小时，就像拿放大镜看物体一样。'
+        };
+      }
+
+      function renderChallenges() {
+        elements.challengeList.innerHTML = '';
+        state.challenges.forEach(challenge => {
+          const info = describeChallenge(challenge);
+          const item = document.createElement('li');
+          item.className = 'challenge-item';
+          if (state.challengeStates[challenge.id]) {
+            item.classList.add('passed');
+          }
+          const title = document.createElement('h4');
+          title.textContent = info.title;
+          const detail = document.createElement('p');
+          detail.textContent = info.detail;
+          const status = document.createElement('p');
+          status.className = 'status';
+          status.textContent = state.challengeStates[challenge.id] ? '✅ 完成！' : '❌ 再试试～';
+          const hint = document.createElement('p');
+          hint.className = 'hint';
+          hint.textContent = info.hint;
+          item.appendChild(title);
+          item.appendChild(detail);
+          item.appendChild(status);
+          item.appendChild(hint);
+          elements.challengeList.appendChild(item);
+        });
+      }
+
+      function challengeSatisfied(challenge, outcome) {
+        if (!outcome || outcome.noImage) return false;
+        const tol = state.tolerance;
+        switch (challenge.type) {
+          case 'realMagnified': {
+            const { targetF, minU, maxU, minV } = challenge.params;
+            const focusOk = Math.abs(state.f - targetF) <= tol;
+            const uOk = state.u >= (minU - tol) && state.u <= (maxU + tol);
+            const vOk = outcome.v > (minV - tol);
+            const magnifyOk = outcome.m < -1.05;
+            return focusOk && uOk && vOk && magnifyOk;
+          }
+          case 'equalSize': {
+            const { targetF } = challenge.params;
+            const focusOk = Math.abs(state.f - targetF) <= tol;
+            const uOk = Math.abs(state.u - 2 * state.f) <= tol;
+            const vOk = Math.abs(outcome.v - 2 * state.f) <= tol;
+            const magnifyOk = Math.abs(Math.abs(outcome.m) - 1) <= 0.05;
+            return focusOk && uOk && vOk && magnifyOk;
+          }
+          case 'magnifier': {
+            const { targetF, minMagnification } = challenge.params;
+            const focusOk = Math.abs(state.f - targetF) <= tol;
+            const uInside = state.u < state.f - Math.max(0.2, tol / 2);
+            const virtualOk = outcome.v < 0 && outcome.m > minMagnification;
+            return focusOk && uInside && virtualOk;
+          }
+          default:
+            return false;
+        }
+      }
+
+      function evaluateChallenges(outcome) {
+        if (state.challenges.length === 0) return;
+        if (!outcome || outcome.noImage) {
+          if (state.mode === 'challenge') {
+            elements.challengeFeedback.textContent = '接近平行光暂无法判定，请先远离焦点位置。';
+          }
+          renderChallenges();
+          return;
+        }
+
+        let changed = false;
+        let lastUnlocked = '';
+        state.challenges.forEach(challenge => {
+          const passed = challengeSatisfied(challenge, outcome);
+          if (passed && !state.challengeStates[challenge.id]) {
+            state.challengeStates[challenge.id] = true;
+            changed = true;
+            lastUnlocked = `${challenge.title} ✅ 完成！`;
+          }
+        });
+
+        if (changed) {
+          saveChallenges();
+        }
+
+        renderChallenges();
+
+        if (state.mode === 'challenge') {
+          const remaining = state.challenges.filter(ch => !state.challengeStates[ch.id]).length;
+          if (changed) {
+            elements.challengeFeedback.textContent = lastUnlocked || '恭喜完成挑战！';
+          } else if (remaining === 0) {
+            elements.challengeFeedback.textContent = '全部关卡完成！可以尝试调整容差或重新抽题。';
+          } else {
+            elements.challengeFeedback.textContent = `尚有 ${remaining} 关待完成，加油！`;
+          }
+        }
+      }
+
+      function updateToleranceDisplay() {
+        elements.tolDisplay.textContent = `±${formatNumber(state.tolerance, 1)} cm`;
+      }
+
+      function handleInputChange(event) {
+        const { id, value, checked } = event.target;
+        if (id === 'show-rays') {
+          state.showRays = checked;
+          persistState('showRays', checked);
+        } else {
+          const numericValue = parseFloat(value);
+          if (id === 'u-range') {
+            state.u = clamp(numericValue, 5, 30);
+            persistState('u', state.u);
+          }
+          if (id === 'f-range') {
+            state.f = clamp(numericValue, 5, 15);
+            persistState('f', state.f);
+          }
+          if (id === 'ho-range') {
+            state.ho = clamp(numericValue, 1, 5);
+            persistState('ho', state.ho);
+          }
+        }
+        scheduleUpdate();
+      }
+
+      function updateScene() {
+        animationHandle = null;
+        const u = clamp(parseFloat(elements.uRange.value), 5, 30);
+        const f = clamp(parseFloat(elements.fRange.value), 5, 15);
+        const ho = clamp(parseFloat(elements.hoRange.value), 1, 5);
+        const showRays = elements.showRays.checked;
+
+        state.u = u;
+        state.f = f;
+        state.ho = ho;
+        state.showRays = showRays;
+
+        elements.uRange.value = u;
+        elements.fRange.value = f;
+        elements.hoRange.value = ho;
+
+        elements.uDisplay.textContent = `${formatNumber(u)} cm`;
+        elements.fDisplay.textContent = `${formatNumber(f)} cm`;
+        elements.hoDisplay.textContent = `${formatNumber(ho)} cm`;
+
+        elements.infoU.textContent = `${formatNumber(u)} cm`;
+        elements.infoF.textContent = `${formatNumber(f)} cm`;
+        elements.infoHo.textContent = `${formatNumber(ho)} cm`;
+
+        setFocusMarkers(f);
+        clearGroups();
+
+        if (Math.abs(u - f) < 0.1) {
+          setNoImageState();
+          evaluateChallenges({ noImage: true });
+          return;
+        }
+
+        const result = computeOutcome(u, f, ho);
+        const objectBase = { x: ORIGIN_X - u * SCALE, y: AXIS_Y };
+        const objectTip = { x: objectBase.x, y: AXIS_Y - ho * SCALE };
+        const imageBase = { x: ORIGIN_X + result.v * SCALE, y: AXIS_Y };
+        const imageTip = { x: imageBase.x, y: AXIS_Y - result.hi * SCALE };
+
+        renderObject(objectBase, objectTip);
+        renderImage(imageBase, imageTip, result.v);
+
+        if (showRays) {
+          renderRays(objectTip, result.v, f, imageTip);
+        }
+
+        updateInfoPanel(result);
+        updateStatusMessage(result);
+        evaluateChallenges(result);
+      }
+
+      function runSelfTest() {
+        const cases = [
+          {
+            label: 'Case A',
+            input: { u: 25, f: 10, ho: 3 },
+            validator: ({ v, m }) => v > 16 && v < 17 && m < 0 && Math.abs(m) < 1,
+            message: 'u=25,f=10 → 倒立缩小实像'
+          },
+          {
+            label: 'Case B',
+            input: { u: 20, f: 10, ho: 3 },
+            validator: ({ v, m }) => Math.abs(v - 20) < 0.2 && Math.abs(Math.abs(m) - 1) < 0.05 && m < 0,
+            message: 'u=20,f=10 → 等大倒立实像'
+          },
+          {
+            label: 'Case C',
+            input: { u: 15, f: 10, ho: 3 },
+            validator: ({ v, m }) => v > 29 && Math.abs(m) > 1.9 && m < 0,
+            message: 'u=15,f=10 → 倒立放大实像'
+          },
+          {
+            label: 'Case D',
+            input: { u: 10, f: 10, ho: 3 },
+            validator: (result) => result.noImage,
+            message: 'u=10,f=10 → 不成像'
+          },
+          {
+            label: 'Case E',
+            input: { u: 8, f: 10, ho: 3 },
+            validator: ({ v, m }) => v < 0 && m > 1.2,
+            message: 'u=8,f=10 → 正立放大虚像'
+          }
+        ];
+
+        const summary = cases.map(testCase => {
+          const result = computeOutcome(testCase.input.u, testCase.input.f, testCase.input.ho);
+          const pass = result.noImage ? testCase.validator(result) : testCase.validator(result);
+          const detail = result.noImage
+            ? '不成像'
+            : `v=${formatNumber(result.v)}cm, m=${formatNumber(result.m, 2)}`;
+          console.log(`[自检] ${testCase.label}: ${pass ? '✅' : '❌'} ${testCase.message} ｜ 结果：${detail}`);
+          return `${testCase.label}：${pass ? '✅' : '❌'} ${testCase.message}`;
+        }).join('\n');
+
+        window.alert(`自检完成：\n${summary}`);
+      }
+
+      function setQuizFeedback(questionEl, status, message) {
+        const feedback = questionEl.querySelector('.quiz-feedback');
+        feedback.textContent = message;
+        feedback.classList.remove('correct', 'incorrect');
+        if (status === 'correct') {
+          feedback.classList.add('correct');
+        } else if (status === 'incorrect') {
+          feedback.classList.add('incorrect');
+        }
+      }
+
+      function updateQuizScore() {
+        const total = elements.quizQuestions.length;
+        const score = Object.values(state.quizResults).filter(value => value === true).length;
+        elements.quizScore.textContent = `本次得分：${score} / ${total}`;
+        persistState('quizScore', state.quizResults);
+      }
+
+      const quizExplanations = {
+        q1: 'u < f 时形成正立放大虚像，因此该说法是错的。',
+        q2: 'u = 2f 时，像距也约等于 2f，得到倒立等大的实像。',
+        q3: '由 1/f = 1/u + 1/v 得 v = 30 cm，且 m = -v/u = -2，为倒立放大实像。'
+      };
+
+      function handleQuizChange(questionEl) {
+        const type = questionEl.dataset.type;
+        const id = questionEl.dataset.question;
+        let result = null;
+        if (type === 'truefalse' || type === 'single') {
+          const selected = questionEl.querySelector('input[type="radio"]:checked');
+          if (!selected) {
+            setQuizFeedback(questionEl, null, '请选择一个选项。');
+            state.quizResults[id] = null;
+            updateQuizScore();
+            return;
+          }
+          const isCorrect = selected.value === questionEl.dataset.answer;
+          state.quizResults[id] = isCorrect;
+          setQuizFeedback(questionEl, isCorrect ? 'correct' : 'incorrect', isCorrect ? '✅ 回答正确！' : `❌ 再想想：${quizExplanations[id]}`);
+          result = isCorrect;
+        } else if (type === 'calculation') {
+          const vInput = questionEl.querySelector('input[data-field="v"]');
+          const natureSelect = questionEl.querySelector('select[data-field="nature"]');
+          const vValue = parseFloat(vInput.value);
+          const natureValue = natureSelect.value;
+          if (Number.isNaN(vValue) || !natureValue) {
+            setQuizFeedback(questionEl, null, '请填写完整的像距和性质。');
+            state.quizResults[id] = null;
+            updateQuizScore();
+            return;
+          }
+          const targetV = parseFloat(questionEl.dataset.answerV);
+          const targetNature = questionEl.dataset.answerNature;
+          const vOk = Math.abs(vValue - targetV) <= 0.2;
+          const natureOk = natureValue === targetNature;
+          const isCorrect = vOk && natureOk;
+          state.quizResults[id] = isCorrect;
+          setQuizFeedback(questionEl, isCorrect ? 'correct' : 'incorrect', isCorrect ? '✅ 计算正确！' : `❌ 请检查：${quizExplanations[id]}`);
+          result = isCorrect;
+        }
+        updateQuizScore();
+        return result;
+      }
+
+      function resetQuiz() {
+        elements.quizQuestions.forEach(question => {
+          question.querySelectorAll('input[type="radio"]').forEach(input => {
+            input.checked = false;
+          });
+          question.querySelectorAll('input[type="number"]').forEach(input => {
+            input.value = '';
+          });
+          question.querySelectorAll('select').forEach(select => {
+            select.value = '';
+          });
+          setQuizFeedback(question, null, '');
+        });
+        state.quizResults = {};
+        updateQuizScore();
+      }
+
+      function initQuiz() {
+        elements.quizQuestions.forEach(question => {
+          const controls = question.querySelectorAll('input, select');
+          controls.forEach(control => {
+            control.addEventListener('change', () => handleQuizChange(question));
+            if (control.type === 'number') {
+              control.addEventListener('input', () => handleQuizChange(question));
+            }
+          });
+        });
+        updateQuizScore();
+        if (Object.keys(state.quizResults).length > 0) {
+          elements.quizQuestions.forEach(question => {
+            const id = question.dataset.question;
+            const stored = state.quizResults[id];
+            if (stored === true) {
+              setQuizFeedback(question, 'correct', '✅ 上次回答正确，可继续挑战新题。');
+            } else if (stored === false) {
+              setQuizFeedback(question, 'incorrect', `❌ 上次未通过：${quizExplanations[id]}`);
+            }
+          });
+        }
+      }
+
+      elements.uRange.addEventListener('input', handleInputChange);
+      elements.fRange.addEventListener('input', handleInputChange);
+      elements.hoRange.addEventListener('input', handleInputChange);
+      elements.showRays.addEventListener('input', handleInputChange);
+
+      elements.teacherToggle.addEventListener('change', event => {
+        state.teacherMode = event.target.checked;
+        document.body.classList.toggle('teacher-mode', state.teacherMode);
+        persistState('teacherMode', state.teacherMode);
+        scheduleUpdate();
+      });
+
+      elements.tolRange.addEventListener('input', event => {
+        state.tolerance = clamp(parseFloat(event.target.value), 0.1, 1);
+        persistState('tolerance', state.tolerance);
+        updateToleranceDisplay();
+        scheduleUpdate();
+      });
+
+      elements.modeTabs.forEach(tab => {
+        tab.addEventListener('click', () => setMode(tab.dataset.mode));
+        tab.addEventListener('keydown', event => {
+          if (event.key === 'Enter' || event.key === ' ') {
+            event.preventDefault();
+            setMode(tab.dataset.mode);
+          }
+        });
+      });
+
+      elements.refreshChallenges.addEventListener('click', () => {
+        state.challenges = createChallengeSet();
+        state.challengeStates = {};
+        saveChallenges();
+        renderChallenges();
+        elements.challengeFeedback.textContent = '已重新抽题，祝你好运！';
+        scheduleUpdate();
+      });
+
+      elements.quizReset.addEventListener('click', resetQuiz);
+      elements.selfTest.addEventListener('click', runSelfTest);
+
+      if (window.location.hash.includes('dev')) {
+        document.body.classList.add('dev-mode');
+      }
+
+      renderChallenges();
+      updateModeUI();
+      updateToleranceDisplay();
+      initQuiz();
+      scheduleUpdate();
+    })();
+  </script>
+</body>
+</html>
