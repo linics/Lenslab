@@ -1108,10 +1108,10 @@
         return text;
       }
 
-      function createCandleUse(baseX, scaleY, { stroke, strokeWidth = 1.2, fillOpacity } = {}) {
+      function createCandleUse(baseX, scaleX, scaleY, { stroke, strokeWidth = 1.2, fillOpacity } = {}) {
         const use = document.createElementNS('http://www.w3.org/2000/svg', 'use');
         use.setAttributeNS('http://www.w3.org/1999/xlink', 'href', '#candle-sprite');
-        use.setAttribute('transform', `translate(${baseX}, ${AXIS_Y}) scale(1, ${scaleY})`);
+        use.setAttribute('transform', `translate(${baseX}, ${AXIS_Y}) scale(${scaleX}, ${scaleY})`);
         if (stroke) {
           use.setAttribute('stroke', stroke);
           use.setAttribute('stroke-width', strokeWidth);
@@ -1187,8 +1187,8 @@
 
       function renderObject(base, tip) {
         const heightPx = Math.max(Math.abs(base.y - tip.y), 1);
-        const scaleY = Math.max(heightPx / 60, 0.02);
-        const candle = createCandleUse(base.x, scaleY, { stroke: '#155b2c', strokeWidth: 1.1, fillOpacity: 0.98 });
+        const scale = Math.max(heightPx / 60, 0.02);
+        const candle = createCandleUse(base.x, scale, scale, { stroke: '#155b2c', strokeWidth: 1.1, fillOpacity: 0.98 });
         const baseLine = createLine({
           x1: base.x - 10,
           y1: base.y,
@@ -1208,8 +1208,9 @@
         const scaleMagnitude = Math.max(heightPx / 60, 0.02);
         const direction = tip.y <= base.y ? 1 : -1;
         const scaleY = scaleMagnitude * direction;
+        const scaleX = scaleMagnitude;
         const stroke = isReal ? '#1c7ed6' : '#f08c00';
-        const candle = createCandleUse(base.x, scaleY, { stroke, strokeWidth: 1.2, fillOpacity: 0.95 });
+        const candle = createCandleUse(base.x, scaleX, scaleY, { stroke, strokeWidth: 1.2, fillOpacity: 0.95 });
         const baseLine = createLine({
           x1: base.x - 10,
           y1: base.y,
@@ -1820,6 +1821,7 @@
       updateToleranceDisplay();
       initQuiz();
       scheduleUpdate();
+      console.log('[LensLab] Candle proportional scaling fix applied @2025-10-20');
     })();
   </script>
 </body>
