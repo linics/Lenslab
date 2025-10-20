@@ -633,6 +633,14 @@
         </label>
       </div>
 
+      <div class="toggle-wrapper" role="group" aria-label="显示第③主光线">
+        <span>显示第③主光线</span>
+        <label class="switch" aria-label="开启或关闭第③主光线">
+          <input id="show-ray3" type="checkbox">
+          <span class="slider" aria-hidden="true"></span>
+        </label>
+      </div>
+
       <div class="toggle-wrapper" role="group" aria-label="教师模式切换">
         <span>教师模式</span>
         <label class="switch" aria-label="开启或关闭教师模式">
@@ -663,9 +671,15 @@
           <marker id="arrow-head" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto" markerUnits="strokeWidth">
             <path d="M0,0 L10,5 L0,10 z" fill="currentColor"></path>
           </marker>
-          <marker id="ray-arrow" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto" markerUnits="strokeWidth">
-            <path d="M0,0 L10,5 L0,10 z" fill="currentColor"></path>
+          <marker id="ray-arrow" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto" markerUnits="strokeWidth">
+            <path d="M0,0 L6,3 L0,6 z" fill="currentColor"></path>
           </marker>
+          <g id="candle-sprite">
+            <rect x="-5" y="-44" width="10" height="44" fill="#1f7a3a" rx="2" ry="2"></rect>
+            <rect x="-1" y="-48" width="2" height="6" fill="#333333"></rect>
+            <path d="M0,-60 C-6,-52 -2,-48 0,-46 C2,-48 6,-52 0,-60 Z" fill="#ffcc33" stroke="#ff9f1a" stroke-width="1"></path>
+            <circle cx="0" cy="-50" r="10" fill="#ffd24d" opacity="0.25"></circle>
+          </g>
         </defs>
         <rect x="0" y="0" width="900" height="420" fill="transparent"></rect>
         <line x1="30" y1="210" x2="870" y2="210" stroke="#1c3d74" stroke-width="2" stroke-dasharray="4 4" opacity="0.6"></line>
@@ -834,6 +848,7 @@
       const today = new Date().toISOString().slice(0, 10);
       console.log(`[LensLab] Step3 build OK @${today}`);
       console.log(`[LensLab] Layout stabilized @${today}`);
+      console.log(`[LensLab] Ray & Candle update @${today}`);
 
       const SCALE = 12;
       const ORIGIN_X = 450;
@@ -867,6 +882,7 @@
         f: 'lenslab_f',
         ho: 'lenslab_ho',
         showRays: 'lenslab_showRays',
+        showRay3: 'lenslab_showRay3',
         teacherMode: 'lenslab_teacherMode',
         tolerance: 'lenslab_tol',
         mode: 'lenslab_mode',
@@ -880,6 +896,7 @@
         f: 10,
         ho: 3,
         showRays: true,
+        showRay3: false,
         teacherMode: false,
         tolerance: 0.5,
         mode: 'explore',
@@ -923,6 +940,7 @@
         const savedF = parseFloat(window.localStorage.getItem(STORAGE_KEYS.f));
         const savedHo = parseFloat(window.localStorage.getItem(STORAGE_KEYS.ho));
         const savedShowRays = window.localStorage.getItem(STORAGE_KEYS.showRays);
+        const savedShowRay3 = window.localStorage.getItem(STORAGE_KEYS.showRay3);
         const savedTeacher = window.localStorage.getItem(STORAGE_KEYS.teacherMode);
         const savedTol = parseFloat(window.localStorage.getItem(STORAGE_KEYS.tolerance));
         const savedMode = window.localStorage.getItem(STORAGE_KEYS.mode);
@@ -934,6 +952,7 @@
         if (!Number.isNaN(savedF)) state.f = clamp(savedF, 5, 15);
         if (!Number.isNaN(savedHo)) state.ho = clamp(savedHo, 1, 5);
         if (savedShowRays !== null) state.showRays = savedShowRays === 'true';
+        if (savedShowRay3 !== null) state.showRay3 = savedShowRay3 === 'true';
         if (savedTeacher !== null) state.teacherMode = savedTeacher === 'true';
         if (!Number.isNaN(savedTol)) state.tolerance = clamp(savedTol, 0.1, 1);
         if (savedMode && MODES.includes(savedMode)) state.mode = savedMode;
@@ -979,6 +998,7 @@
         fRange: document.getElementById('f-range'),
         hoRange: document.getElementById('ho-range'),
         showRays: document.getElementById('show-rays'),
+        showRay3: document.getElementById('show-ray3'),
         teacherToggle: document.getElementById('teacher-mode-toggle'),
         tolRange: document.getElementById('tol-range'),
         uDisplay: document.getElementById('u-display'),
@@ -1026,6 +1046,7 @@
       elements.fRange.value = state.f;
       elements.hoRange.value = state.ho;
       elements.showRays.checked = state.showRays;
+      elements.showRay3.checked = state.showRay3;
       elements.teacherToggle.checked = state.teacherMode;
       elements.tolRange.value = state.tolerance;
       elements.stage.dataset.modeText = modePrompts[state.mode].badge;
@@ -1085,6 +1106,21 @@
         text.setAttribute('class', 'ray-label');
         text.textContent = textContent;
         return text;
+      }
+
+      function createCandleUse(baseX, scaleY, { stroke, strokeWidth = 1.2, fillOpacity } = {}) {
+        const use = document.createElementNS('http://www.w3.org/2000/svg', 'use');
+        use.setAttributeNS('http://www.w3.org/1999/xlink', 'href', '#candle-sprite');
+        use.setAttribute('transform', `translate(${baseX}, ${AXIS_Y}) scale(1, ${scaleY})`);
+        if (stroke) {
+          use.setAttribute('stroke', stroke);
+          use.setAttribute('stroke-width', strokeWidth);
+        }
+        if (fillOpacity !== undefined) {
+          use.setAttribute('fill-opacity', fillOpacity);
+        }
+        use.setAttribute('pointer-events', 'none');
+        return use;
       }
 
       function updateInfoPanel({ v, m, hi }) {
@@ -1150,53 +1186,41 @@
       }
 
       function renderObject(base, tip) {
-        const objectLine = createLine({
-          x1: base.x,
-          y1: base.y,
-          x2: tip.x,
-          y2: tip.y,
-          stroke: '#1c3d74',
-          'stroke-width': 4,
-          'stroke-linecap': 'round',
-          'marker-end': 'url(#arrow-head)'
-        });
+        const heightPx = Math.max(Math.abs(base.y - tip.y), 1);
+        const scaleY = Math.max(heightPx / 60, 0.02);
+        const candle = createCandleUse(base.x, scaleY, { stroke: '#155b2c', strokeWidth: 1.1, fillOpacity: 0.98 });
         const baseLine = createLine({
-          x1: base.x - 8,
+          x1: base.x - 10,
           y1: base.y,
-          x2: base.x + 8,
+          x2: base.x + 10,
           y2: base.y,
-          stroke: '#1c3d74',
-          'stroke-width': 3,
+          stroke: 'rgba(21, 91, 44, 0.65)',
+          'stroke-width': 2,
           'stroke-linecap': 'round'
         });
-        elements.objectsGroup.appendChild(objectLine);
         elements.objectsGroup.appendChild(baseLine);
+        elements.objectsGroup.appendChild(candle);
       }
 
       function renderImage(base, tip, v) {
         const isReal = v > 0;
-        const color = isReal ? '#1c7ed6' : '#f08c00';
-        const imageLine = createLine({
-          x1: base.x,
-          y1: base.y,
-          x2: tip.x,
-          y2: tip.y,
-          stroke: color,
-          'stroke-width': 4,
-          'stroke-linecap': 'round',
-          'marker-end': 'url(#arrow-head)'
-        });
+        const heightPx = Math.max(Math.abs(base.y - tip.y), 1);
+        const scaleMagnitude = Math.max(heightPx / 60, 0.02);
+        const direction = tip.y <= base.y ? 1 : -1;
+        const scaleY = scaleMagnitude * direction;
+        const stroke = isReal ? '#1c7ed6' : '#f08c00';
+        const candle = createCandleUse(base.x, scaleY, { stroke, strokeWidth: 1.2, fillOpacity: 0.95 });
         const baseLine = createLine({
-          x1: base.x - 8,
+          x1: base.x - 10,
           y1: base.y,
-          x2: base.x + 8,
+          x2: base.x + 10,
           y2: base.y,
-          stroke: color,
-          'stroke-width': 3,
+          stroke: isReal ? 'rgba(28, 126, 214, 0.55)' : 'rgba(240, 140, 0, 0.55)',
+          'stroke-width': 2,
           'stroke-linecap': 'round'
         });
-        elements.objectsGroup.appendChild(imageLine);
         elements.objectsGroup.appendChild(baseLine);
+        elements.objectsGroup.appendChild(candle);
       }
 
       function extendLine(pointA, pointB, targetX) {
@@ -1216,13 +1240,15 @@
         const mid = (a, b) => ({ x: (a.x + b.x) / 2, y: (a.y + b.y) / 2 });
         const firstMid = mid(objectTip, lensParallelPoint);
         const secondMid = mid(objectTip, lensCenter);
-        const thirdMid = mid(objectTip, leftFocusPoint);
         const label1 = createText(firstMid.x + 6, firstMid.y - 18, '①');
         const label2 = createText(secondMid.x + 10, secondMid.y - 18, '②');
-        const label3 = createText(thirdMid.x, thirdMid.y - 18, '③');
         elements.rayLabelsGroup.appendChild(label1);
         elements.rayLabelsGroup.appendChild(label2);
-        elements.rayLabelsGroup.appendChild(label3);
+        if (state.showRay3) {
+          const thirdMid = mid(objectTip, leftFocusPoint);
+          const label3 = createText(thirdMid.x, thirdMid.y - 18, '③');
+          elements.rayLabelsGroup.appendChild(label3);
+        }
 
         if (!isReal) {
           const note = createText(imageTip.x + 50, imageTip.y - 20, '延长线观测');
@@ -1247,7 +1273,7 @@
         }
         const ray1 = createPolyline(ray1Points, {
           stroke: rayColor,
-          'stroke-width': 2.5,
+          'stroke-width': 2,
           fill: 'none',
           'marker-end': 'url(#ray-arrow)'
         });
@@ -1262,7 +1288,7 @@
           ray2Target
         ], {
           stroke: rayColor,
-          'stroke-width': 2.5,
+          'stroke-width': 2,
           fill: 'none',
           'marker-end': 'url(#ray-arrow)'
         });
@@ -1277,14 +1303,16 @@
           ray3Target
         ], {
           stroke: rayColor,
-          'stroke-width': 2.5,
+          'stroke-width': 2,
           fill: 'none',
           'marker-end': 'url(#ray-arrow)'
         });
 
         elements.raysGroup.appendChild(ray1);
         elements.raysGroup.appendChild(ray2);
-        elements.raysGroup.appendChild(ray3);
+        if (state.showRay3) {
+          elements.raysGroup.appendChild(ray3);
+        }
 
         if (!isReal) {
           const dashedAttrs = {
@@ -1295,10 +1323,12 @@
           };
           const ray1Dash = createPolyline([lensParallelPoint, imageTip], dashedAttrs);
           const ray2Dash = createPolyline([lensCenter, imageTip], dashedAttrs);
-          const ray3Dash = createPolyline([lensIntersectionForRay3, imageTip], dashedAttrs);
           elements.raysGroup.appendChild(ray1Dash);
           elements.raysGroup.appendChild(ray2Dash);
-          elements.raysGroup.appendChild(ray3Dash);
+          if (state.showRay3) {
+            const ray3Dash = createPolyline([lensIntersectionForRay3, imageTip], dashedAttrs);
+            elements.raysGroup.appendChild(ray3Dash);
+          }
         }
 
         renderRayLabels(objectTip, lensParallelPoint, lensCenter, lensIntersectionForRay3, imageTip, isReal);
@@ -1511,6 +1541,9 @@
         if (id === 'show-rays') {
           state.showRays = checked;
           persistState('showRays', checked);
+        } else if (id === 'show-ray3') {
+          state.showRay3 = checked;
+          persistState('showRay3', checked);
         } else {
           const numericValue = parseFloat(value);
           if (id === 'u-range') {
@@ -1535,15 +1568,19 @@
         const f = clamp(parseFloat(elements.fRange.value), 5, 15);
         const ho = clamp(parseFloat(elements.hoRange.value), 1, 5);
         const showRays = elements.showRays.checked;
+        const showRay3 = elements.showRay3.checked;
 
         state.u = u;
         state.f = f;
         state.ho = ho;
         state.showRays = showRays;
+        state.showRay3 = showRay3;
 
         elements.uRange.value = u;
         elements.fRange.value = f;
         elements.hoRange.value = ho;
+        elements.showRays.checked = showRays;
+        elements.showRay3.checked = showRay3;
 
         elements.uDisplay.textContent = `${formatNumber(u)} cm`;
         elements.fDisplay.textContent = `${formatNumber(f)} cm`;
@@ -1736,6 +1773,7 @@
       elements.fRange.addEventListener('input', handleInputChange);
       elements.hoRange.addEventListener('input', handleInputChange);
       elements.showRays.addEventListener('input', handleInputChange);
+      elements.showRay3.addEventListener('input', handleInputChange);
 
       elements.teacherToggle.addEventListener('change', event => {
         state.teacherMode = event.target.checked;
@@ -1788,3 +1826,7 @@
 </html>
 
 <!-- CHANGELOG 2025-10-20: Fixed canvas vertical shift (locked grid height, removed stage centering) -->
+<!-- CHANGELOG 2025-10-20:
+     Added toggle for 3rd ray (default OFF);
+     Replaced object/image arrows with candle sprite (larger flame);
+     Reduced ray arrowheads to avoid overlap with the image. -->
