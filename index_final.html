@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>凸透镜成像虚拟实验课（Final）</title>
+  <title>凸透镜成像虚拟实验课（Step 3）</title>
   <style>
     :root {
       color-scheme: light;
@@ -13,16 +13,14 @@
       --primary-soft: rgba(28, 61, 116, 0.1);
       --text: #2a2a2a;
       --muted: #6c7a89;
-      --real: #1e6ffb;
-      --virtual: #ff8a00;
-      --success: #2b8a3e;
+      --real: #1c7ed6;
+      --virtual: #f08c00;
       --danger: #d9480f;
-      --stage-bg: #f9fcff;
-      --border: rgba(28, 61, 116, 0.12);
+      --success: #2b8a3e;
       --quiz-border: rgba(28, 61, 116, 0.2);
     }
 
-    *, *::before, *::after {
+    * {
       box-sizing: border-box;
     }
 
@@ -33,22 +31,19 @@
       color: var(--text);
       line-height: 1.6;
       font-size: 16px;
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
     }
 
     header,
     footer {
       background: #ffffff;
-      border-bottom: 1px solid var(--border);
+      border-bottom: 1px solid rgba(28, 61, 116, 0.12);
       padding: 16px 24px;
       box-shadow: 0 2px 8px rgba(28, 61, 116, 0.08);
     }
 
     footer {
       border-bottom: none;
-      border-top: 1px solid var(--border);
+      border-top: 1px solid rgba(28, 61, 116, 0.12);
       box-shadow: 0 -2px 8px rgba(28, 61, 116, 0.08);
       text-align: center;
       font-size: 15px;
@@ -67,277 +62,58 @@
       color: var(--muted);
     }
 
-    main.layout {
+    main {
       display: grid;
-      grid-template-columns: 280px 1fr 300px;
       gap: 20px;
       padding: 20px 24px 32px;
-      flex: 1;
-      height: calc(100vh - 60px);
-      min-height: 0;
+      grid-template-columns: minmax(260px, 320px) 1fr minmax(280px, 340px);
+      min-height: calc(100vh - 160px);
     }
 
-    #controls,
-    #info {
-      overflow-y: auto;
-      padding: 1rem;
+    section {
       background: var(--card-bg);
       border-radius: 16px;
       box-shadow: 0 8px 24px rgba(28, 61, 116, 0.12);
+      padding: 20px 24px;
       display: flex;
       flex-direction: column;
       gap: 16px;
-      min-height: 0;
     }
 
-    #stage-container {
-      position: relative;
-      min-height: 420px;
-      overflow: hidden;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      background: linear-gradient(#fbfdff, #f5f9ff);
-      border-radius: 18px;
-      box-shadow: inset 0 0 0 1px rgba(30, 111, 251, 0.08), 0 8px 24px rgba(28, 61, 116, 0.12);
-      min-width: 0;
-    }
-
-    #stage-container::after {
-      content: attr(data-mode-label);
-      position: absolute;
-      top: 14px;
-      right: 16px;
-      font-weight: 600;
-      font-size: 15px;
-      color: rgba(28, 61, 116, 0.7);
-    }
-
-    #mode-ui {
-      position: absolute;
-      left: 0;
-      right: 0;
-      bottom: 12px;
-      z-index: 5;
-      display: flex;
-      justify-content: center;
-      pointer-events: auto;
-      padding: 0 16px;
-    }
-
-    svg#lens-svg {
-      width: 100%;
-      height: auto;
-      display: block;
-    }
-
-    #mode-ui .mode-card {
-      max-width: min(720px, 68%);
-      width: 100%;
-      background: rgba(255, 255, 255, 0.92);
-      border: 1px solid rgba(20, 70, 140, 0.12);
-      box-shadow: 0 6px 24px rgba(20, 70, 140, 0.12);
-      border-radius: 12px;
-      padding: 14px 18px;
-      font-size: 14px;
-      line-height: 1.55;
-      color: #0f1f3a;
-      backdrop-filter: saturate(120%) blur(2px);
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-      max-height: 160px;
-      overflow: auto;
-    }
-
-    #mode-ui .mode-card h4 {
-      margin: 0 0 6px;
-      font-size: 15px;
-      font-weight: 700;
-      color: #113a8f;
-    }
-
-    #mode-ui .mode-card p,
-    #mode-ui .mode-card li {
-      margin: 0.2rem 0;
-    }
-
-    #mode-ui .mode-card ul {
-      padding-left: 1.1rem;
-    }
-
-    #mode-ui .mode-card .result-ok {
-      color: #0b8a2a;
-      font-weight: 600;
-    }
-
-    #mode-ui .mode-card .result-bad {
-      color: #c62828;
-      font-weight: 600;
-    }
-
-    #mode-ui .mode-card .btn,
-    #mode-ui .mode-card button {
-      align-self: flex-start;
-      background: var(--primary);
-      color: #ffffff;
-      border: none;
-      border-radius: 999px;
-      padding: 8px 16px;
-      font-size: 14px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: transform 0.2s, box-shadow 0.2s;
-    }
-
-    #mode-ui .mode-card .btn:hover,
-    #mode-ui .mode-card button:hover {
-      transform: translateY(-1px);
-      box-shadow: 0 6px 12px rgba(28, 61, 116, 0.18);
-    }
-
-    #mode-ui .mode-card .btn:focus,
-    #mode-ui .mode-card button:focus {
-      outline: 2px solid rgba(28, 61, 116, 0.5);
-      outline-offset: 2px;
-    }
-
-    #stage-hud {
-      position: absolute;
-      left: 16px;
-      top: 16px;
-      z-index: 2;
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-      max-width: 260px;
-    }
-
-    #lens-shape {
-      fill: url(#lensGrad);
-      fill-opacity: 0.26;
-      stroke: #3aa0ff;
-      stroke-opacity: 0.9;
-      stroke-width: 2;
-    }
-
-    #lens-center-line {
-      stroke: #3aa0ff;
-      stroke-width: 2;
-      stroke-linecap: round;
-      stroke-opacity: 0.9;
-    }
-
-    #rays .ray {
-      stroke: #1e6ffb;
-      stroke-opacity: 0.55;
-      stroke-width: 2;
-      fill: none;
-    }
-
-    #rays .ray.dashed {
-      stroke-opacity: 0.4;
-      stroke-dasharray: 6 6;
-    }
-
-    #objects .image {
-      stroke: #1e6ffb;
-      fill: #1e6ffb;
-    }
-
-    #objects .image.virtual {
-      stroke: #ff8a00;
-      fill: #ff8a00;
-    }
-
-    #mode-guide {
+    #controls h2,
+    #info h2,
+    #stage h2 {
       margin: 0;
-      font-size: 15px;
-      color: var(--muted);
-      background: rgba(255, 255, 255, 0.9);
-      padding: 6px 10px;
-      border-radius: 6px;
-    }
-
-    #status-text {
-      margin: 0;
-      font-size: 16px;
-      font-weight: 600;
+      font-size: 20px;
       color: var(--primary);
-      background: rgba(255, 255, 255, 0.95);
-      padding: 6px 10px;
-      border-radius: 6px;
-      box-shadow: inset 0 0 0 1px rgba(28, 61, 116, 0.08);
     }
 
-    #status-text.warning {
-      color: var(--danger);
-    }
-
-    #status-text.positive {
-      color: var(--success);
-    }
-
-    .hint {
-      margin: -4px 0 0;
+    #controls .hint {
+      margin: -4px 0 4px;
       color: var(--muted);
       font-size: 15px;
     }
 
-    #mode-tabs {
-      display: flex;
-      gap: 12px;
-      flex-wrap: wrap;
-    }
-
-    .mode-tab {
-      border: none;
-      background: rgba(28, 61, 116, 0.12);
-      color: var(--primary);
-      padding: 8px 16px;
-      border-radius: 999px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: background 0.2s, transform 0.2s;
-    }
-
-    .mode-tab[aria-selected="true"],
-    .mode-tab.active {
-      background: var(--primary);
-      color: #ffffff;
-      transform: translateY(-1px);
-    }
-
-    .mode-tab:focus {
-      outline: 2px solid var(--primary);
-      outline-offset: 2px;
-    }
-
-    .control-item,
-    .toggle-wrapper,
-    .select-wrapper {
+    .control-item {
       display: flex;
       flex-direction: column;
       gap: 10px;
       padding: 14px;
-      border: 1px solid var(--border);
+      border: 1px solid rgba(28, 61, 116, 0.12);
       border-radius: 12px;
       background: rgba(247, 248, 250, 0.7);
     }
 
-    .control-item label,
-    .select-wrapper label,
-    .toggle-wrapper span {
+    .control-item label {
       font-weight: 600;
-      font-size: 17px;
       display: flex;
       justify-content: space-between;
       align-items: center;
+      font-size: 17px;
       gap: 12px;
     }
 
-    .control-item output,
-    .select-wrapper output {
+    .control-item output {
       min-width: 90px;
       text-align: right;
       font-variant-numeric: tabular-nums;
@@ -348,13 +124,22 @@
       accent-color: var(--primary);
     }
 
-    .select-wrapper select {
-      width: 100%;
-      padding: 8px 10px;
-      border-radius: 8px;
-      border: 1px solid var(--border);
-      font-size: 16px;
-      background: #ffffff;
+    .helper {
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .toggle-wrapper {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px;
+      border: 1px solid rgba(28, 61, 116, 0.12);
+      border-radius: 12px;
+      background: rgba(247, 248, 250, 0.7);
+      font-weight: 600;
+      font-size: 17px;
+      gap: 12px;
     }
 
     .switch {
@@ -402,9 +187,96 @@
       transform: translateX(26px);
     }
 
-    .helper {
+    #stage {
+      position: relative;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 24px;
+      overflow: hidden;
+    }
+
+    #stage h2 {
+      align-self: flex-start;
+    }
+
+    #mode-tabs {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-top: 4px;
+    }
+
+    .mode-tab {
+      border: none;
+      background: rgba(28, 61, 116, 0.12);
+      color: var(--primary);
+      padding: 8px 16px;
+      border-radius: 999px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.2s;
+    }
+
+    .mode-tab[aria-selected="true"],
+    .mode-tab.active {
+      background: var(--primary);
+      color: #ffffff;
+      transform: translateY(-1px);
+    }
+
+    .mode-tab:focus {
+      outline: 2px solid var(--primary);
+      outline-offset: 2px;
+    }
+
+    #stage svg {
+      width: 100%;
+      max-width: 900px;
+      height: auto;
+      border-radius: 12px;
+      background-image: linear-gradient(180deg, rgba(255, 255, 255, 0.95), rgba(235, 240, 250, 0.9));
+      box-shadow: inset 0 0 0 1px rgba(28, 61, 116, 0.12);
+    }
+
+    body.teacher-mode #stage svg {
+      background-image:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.9), rgba(230, 237, 250, 0.9)),
+        linear-gradient(0deg, rgba(28, 61, 116, 0.12) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(28, 61, 116, 0.12) 1px, transparent 1px);
+      background-size: cover, 40px 40px, 40px 40px;
+    }
+
+    #stage::after {
+      content: attr(data-mode-text);
+      position: absolute;
+      top: 12px;
+      right: 24px;
+      font-weight: 600;
+      font-size: 15px;
+      color: rgba(28, 61, 116, 0.6);
+    }
+
+    #mode-guide {
+      margin: 4px 0 0;
+      font-size: 16px;
       color: var(--muted);
-      font-size: 14px;
+    }
+
+    #status-text {
+      margin: 4px 0 0;
+      font-size: 18px;
+      color: var(--muted);
+    }
+
+    #status-text.warning {
+      color: var(--danger);
+      font-weight: 600;
+    }
+
+    #status-text.positive {
+      color: var(--success);
+      font-weight: 600;
     }
 
     .info-card {
@@ -460,12 +332,12 @@
     }
 
     .badge.real {
-      background: rgba(30, 111, 251, 0.15);
+      background: rgba(28, 126, 214, 0.15);
       color: var(--real);
     }
 
     .badge.virtual {
-      background: rgba(255, 138, 0, 0.18);
+      background: rgba(240, 140, 0, 0.18);
       color: var(--virtual);
     }
 
@@ -475,6 +347,85 @@
       flex-wrap: wrap;
       gap: 8px;
       align-items: center;
+    }
+
+    #image-nature span {
+      font-weight: 600;
+    }
+
+    .mode-card {
+      display: none;
+    }
+
+    .mode-card.active {
+      display: flex;
+    }
+
+    .mode-card table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 15px;
+    }
+
+    .mode-card th,
+    .mode-card td {
+      border: 1px solid rgba(28, 61, 116, 0.16);
+      padding: 6px 10px;
+      text-align: center;
+    }
+
+    .mode-card th {
+      background: rgba(28, 61, 116, 0.08);
+      color: var(--primary);
+    }
+
+    .challenge-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .challenge-item {
+      border: 1px dashed rgba(28, 61, 116, 0.3);
+      border-radius: 12px;
+      padding: 10px 12px;
+      text-align: left;
+      position: relative;
+      background: rgba(247, 248, 250, 0.6);
+    }
+
+    .challenge-item h4 {
+      margin: 0 0 4px;
+      font-size: 16px;
+      color: var(--primary);
+    }
+
+    .challenge-item p {
+      margin: 4px 0;
+      font-size: 15px;
+    }
+
+    .challenge-item .status {
+      font-weight: 600;
+      color: var(--danger);
+    }
+
+    .challenge-item.passed {
+      border-color: rgba(43, 138, 62, 0.6);
+      background: rgba(43, 138, 62, 0.08);
+    }
+
+    .challenge-item.passed .status {
+      color: var(--success);
+    }
+
+    .challenge-actions {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
     }
 
     button {
@@ -508,6 +459,7 @@
       padding: 10px 14px;
       border-radius: 10px;
       font-weight: 600;
+      cursor: pointer;
     }
 
     body.dev-mode .dev-only {
@@ -523,169 +475,131 @@
       display: flex;
     }
 
-    body.teacher-mode svg#lens-svg {
-      background-image:
-        linear-gradient(180deg, rgba(255, 255, 255, 0.9), rgba(230, 237, 250, 0.9)),
-        linear-gradient(0deg, rgba(28, 61, 116, 0.12) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(28, 61, 116, 0.12) 1px, transparent 1px);
-      background-size: cover, 40px 40px, 40px 40px;
+    #focus-markers {
+      display: none;
     }
 
-    #mode-ui .challenge-list {
-      list-style: none;
-      padding: 0;
-      margin: 4px 0 0;
+    body.teacher-mode #focus-markers {
+      display: block;
+    }
+
+    .ray-label {
+      font-size: 18px;
+      font-weight: 700;
+      fill: rgba(28, 61, 116, 0.9);
+      text-shadow: 0 1px 2px rgba(255, 255, 255, 0.7);
+    }
+
+    .quiz-question {
+      border: 1px solid var(--quiz-border);
+      border-radius: 12px;
+      padding: 12px;
       display: flex;
       flex-direction: column;
       gap: 8px;
+      background: rgba(247, 248, 250, 0.6);
     }
 
-    #mode-ui .challenge-item {
-      border: 1px solid rgba(20, 70, 140, 0.18);
-      border-radius: 10px;
-      padding: 8px 10px;
-      background: rgba(20, 70, 140, 0.06);
-      font-size: 14px;
-      line-height: 1.5;
-    }
-
-    #mode-ui .challenge-item h4 {
-      margin: 0 0 2px;
-      font-size: 15px;
-      color: #113a8f;
-    }
-
-    #mode-ui .challenge-item .status {
-      margin: 4px 0 0;
-    }
-
-    #mode-ui .challenge-item.passed {
-      border-color: rgba(11, 138, 42, 0.4);
-      background: rgba(11, 138, 42, 0.08);
-    }
-
-    #mode-ui .challenge-actions {
-      margin-top: 6px;
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-    }
-
-    #mode-ui .quiz-question {
-      border: 1px solid rgba(20, 70, 140, 0.18);
-      border-radius: 10px;
-      padding: 10px;
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-      background: rgba(20, 70, 140, 0.05);
-      font-size: 14px;
-    }
-
-    #mode-ui .quiz-question h4 {
+    .quiz-question h4 {
       margin: 0;
-      font-size: 15px;
-      color: #113a8f;
+      font-size: 16px;
+      color: var(--primary);
     }
 
-    #mode-ui .quiz-options {
+    .quiz-options {
       display: flex;
       flex-wrap: wrap;
-      gap: 10px;
+      gap: 12px;
     }
 
-    #mode-ui .quiz-options label {
+    .quiz-options label {
       display: flex;
       align-items: center;
       gap: 6px;
+      font-weight: 500;
     }
 
-    #mode-ui .quiz-feedback {
+    .quiz-feedback {
       font-weight: 600;
       color: var(--muted);
+      min-height: 20px;
     }
 
-    #mode-ui .quiz-feedback.correct {
+    .quiz-feedback.correct {
       color: var(--success);
     }
 
-    #mode-ui .quiz-feedback.incorrect {
+    .quiz-feedback.incorrect {
       color: var(--danger);
     }
 
-    #mode-ui .quiz-input {
-      padding: 4px 6px;
-      border-radius: 6px;
-      border: 1px solid var(--border);
-    }
-
-    .sr-only {
-      position: absolute;
-      width: 1px;
-      height: 1px;
-      padding: 0;
-      margin: -1px;
-      overflow: hidden;
-      clip: rect(0, 0, 0, 0);
-      white-space: nowrap;
-      border: 0;
-    }
-
-    #mode-ui .mode-card table {
-      border-collapse: collapse;
-      width: 100%;
-      font-size: 14px;
+    .quiz-input {
+      border: 1px solid rgba(28, 61, 116, 0.3);
       border-radius: 8px;
-      overflow: hidden;
+      padding: 6px 10px;
+      font-size: 15px;
+      min-width: 120px;
     }
 
-    #mode-ui .mode-card th,
-    #mode-ui .mode-card td {
-      border-bottom: 1px solid rgba(20, 70, 140, 0.12);
-      padding: 4px 6px;
-      text-align: left;
-    }
-
-    #mode-ui .mode-card th {
-      background: rgba(20, 70, 140, 0.08);
-      color: #113a8f;
-      font-weight: 600;
-    }
-
-    @media (max-width: 900px) {
-      main.layout {
-        grid-template-columns: 1fr;
-        grid-template-rows: auto 1fr auto;
-        height: auto;
+    @media (max-width: 1100px) {
+      main {
+        grid-template-columns: minmax(240px, 300px) 1fr;
+        grid-template-areas:
+          "controls stage"
+          "info info";
       }
 
-      #controls,
+      #controls {
+        grid-area: controls;
+      }
+
+      #stage {
+        grid-area: stage;
+      }
+
       #info {
-        max-height: 35vh;
+        grid-area: info;
+      }
+    }
+
+    @media (max-width: 768px) {
+      main {
+        grid-template-columns: 1fr;
       }
 
-      #stage-container {
-        min-height: 360px;
+      section {
+        padding: 18px;
+      }
+
+      header,
+      footer {
+        padding: 14px 18px;
+      }
+
+      header h1 {
+        font-size: 24px;
+      }
+
+      body {
+        font-size: 17px;
+      }
+
+      #stage::after {
+        display: none;
       }
     }
   </style>
 </head>
 <body>
   <header>
-    <h1>凸透镜成像虚拟实验课</h1>
-    <p>适用于课堂投影与移动端的互动 H5｜探索成像规律·完成挑战·通过测验</p>
+    <h1>凸透镜成像虚拟实验课（Convex Lens Imaging Lab）</h1>
+    <p>Step 3：探索 · 总结 · 挑战 · 测验，一站式课堂体验</p>
   </header>
 
-  <main class="layout">
-    <aside id="controls" aria-labelledby="controls-title">
-      <h2 id="controls-title">操作面板</h2>
+  <main>
+    <section id="controls" aria-labelledby="controls-title">
+      <h2 id="controls-title">调节区</h2>
       <p class="hint" id="mode-hint">拖动滑块看看会发生什么～</p>
-      <nav id="mode-tabs" role="tablist" aria-label="教学模式切换">
-        <button type="button" class="mode-tab" role="tab" aria-selected="true" data-mode="explore">探索</button>
-        <button type="button" class="mode-tab" role="tab" aria-selected="false" data-mode="summary">规律总结</button>
-        <button type="button" class="mode-tab" role="tab" aria-selected="false" data-mode="challenge">挑战</button>
-        <button type="button" class="mode-tab" role="tab" aria-selected="false" data-mode="quiz">测验</button>
-      </nav>
 
       <div class="control-item">
         <label for="u-range"><span>物距 <strong>u</strong></span><output id="u-display" for="u-range">18.0 cm</output></label>
@@ -705,27 +619,10 @@
         <small id="ho-helper" class="helper">范围：1–5 cm</small>
       </div>
 
-      <div class="select-wrapper">
-        <label for="spriteSelect">物体类型：</label>
-        <select id="spriteSelect">
-          <option value="candle">蜡烛</option>
-          <option value="person">小人</option>
-          <option value="arrow">箭头</option>
-        </select>
-      </div>
-
       <div class="toggle-wrapper" role="group" aria-label="光线显示切换">
         <span>显示三条主光线</span>
         <label class="switch" aria-label="显示或隐藏光线">
           <input id="show-rays" type="checkbox" checked>
-          <span class="slider" aria-hidden="true"></span>
-        </label>
-      </div>
-
-      <div class="toggle-wrapper" role="group" aria-label="显示屏幕切换">
-        <span>显示屏幕</span>
-        <label class="switch" aria-label="显示或隐藏屏幕">
-          <input id="show-screen" type="checkbox">
           <span class="slider" aria-hidden="true"></span>
         </label>
       </div>
@@ -745,65 +642,47 @@
       </div>
 
       <button type="button" id="self-test" class="dev-only">运行自检（开发专用）</button>
-    </aside>
-
-    <section id="stage-container" aria-labelledby="stage-title" data-mode-label="探索模式">
-      <h2 id="stage-title" class="sr-only">成像画布</h2>
-      <svg id="lens-svg" viewBox="0 0 900 420" preserveAspectRatio="xMidYMid meet" role="img" aria-label="凸透镜成像画布">
-        <defs>
-          <linearGradient id="lensGrad" x1="0%" y1="0%" x2="0%" y2="100%">
-            <stop offset="0%" stop-color="#a9e7ff" stop-opacity="0.9"></stop>
-            <stop offset="50%" stop-color="#d7f4ff" stop-opacity="0.6"></stop>
-            <stop offset="100%" stop-color="#a9e7ff" stop-opacity="0.9"></stop>
-          </linearGradient>
-          <marker id="arrowhead" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto" markerUnits="strokeWidth">
-            <path d="M0,0 L6,3 L0,6 z" fill="currentColor"></path>
-          </marker>
-          <g id="sprite-candle">
-            <rect x="-4" y="-60" width="8" height="60" fill="#1f7a3a"></rect>
-            <path d="M0,-64 C-3,-68 3,-68 0,-64 Z" fill="#ffcc33"></path>
-          </g>
-          <g id="sprite-person">
-            <circle cx="0" cy="-65" r="5" fill="#1f7a3a"></circle>
-            <line x1="0" y1="-60" x2="0" y2="0" stroke="#1f7a3a" stroke-width="3"></line>
-            <line x1="0" y1="-40" x2="-12" y2="-25" stroke="#1f7a3a" stroke-width="3"></line>
-            <line x1="0" y1="-40" x2="12" y2="-25" stroke="#1f7a3a" stroke-width="3"></line>
-          </g>
-          <g id="sprite-arrow">
-            <line x1="0" y1="0" x2="0" y2="-60" stroke="#1f7a3a" stroke-width="3" marker-end="url(#arrowhead)"></line>
-          </g>
-        </defs>
-        <rect x="0" y="0" width="900" height="420" fill="transparent"></rect>
-        <g id="rays"></g>
-        <g id="objects"></g>
-        <g id="lens">
-          <path id="lens-shape" fill="url(#lensGrad)"></path>
-          <line id="lens-center-line" x1="450" y1="40" x2="450" y2="380"></line>
-        </g>
-        <g id="markers">
-          <line id="principal-axis" x1="30" y1="210" x2="870" y2="210" stroke="#1c3d74" stroke-width="2" stroke-dasharray="4 4" opacity="0.6"></line>
-          <g id="focus-markers" fill="none" stroke="#1c3d74" stroke-width="2" opacity="0.75">
-            <line id="left-2f" x1="210" y1="190" x2="210" y2="230"></line>
-            <text id="left-2f-label" x="210" y="252" text-anchor="middle" font-size="16" fill="#1c3d74">2F</text>
-            <line id="left-f" x1="330" y1="190" x2="330" y2="230"></line>
-            <text id="left-f-label" x="330" y="252" text-anchor="middle" font-size="16" fill="#1c3d74">F</text>
-            <line id="right-f" x1="570" y1="190" x2="570" y2="230"></line>
-            <text id="right-f-label" x="570" y="252" text-anchor="middle" font-size="16" fill="#1c3d74">F</text>
-            <line id="right-2f" x1="690" y1="190" x2="690" y2="230"></line>
-            <text id="right-2f-label" x="690" y="252" text-anchor="middle" font-size="16" fill="#1c3d74">2F</text>
-          </g>
-          <g id="screen-layer"></g>
-          <g id="label-layer"></g>
-        </g>
-      </svg>
-      <div id="stage-hud">
-        <p id="mode-guide">探索模式：拖动滑块观察成像随参数的变化。</p>
-        <p id="status-text" aria-live="polite">实时演示中：移动滑块观察成像规律。</p>
-      </div>
-      <div id="mode-ui" aria-live="polite"></div>
     </section>
 
-    <aside id="info" aria-labelledby="info-title">
+    <section id="stage" aria-labelledby="stage-title" data-mode-text="探索模式">
+      <h2 id="stage-title">成像画布</h2>
+      <nav id="mode-tabs" role="tablist" aria-label="模式切换">
+        <button type="button" class="mode-tab" role="tab" aria-selected="true" data-mode="explore">探索</button>
+        <button type="button" class="mode-tab" role="tab" aria-selected="false" data-mode="summary">规律总结</button>
+        <button type="button" class="mode-tab" role="tab" aria-selected="false" data-mode="challenge">挑战</button>
+        <button type="button" class="mode-tab" role="tab" aria-selected="false" data-mode="quiz">测验</button>
+      </nav>
+      <svg id="lens-svg" viewBox="0 0 900 420" role="img" aria-label="凸透镜成像画布">
+        <defs>
+          <marker id="arrow-head" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto" markerUnits="strokeWidth">
+            <path d="M0,0 L10,5 L0,10 z" fill="currentColor"></path>
+          </marker>
+          <marker id="ray-arrow" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto" markerUnits="strokeWidth">
+            <path d="M0,0 L10,5 L0,10 z" fill="currentColor"></path>
+          </marker>
+        </defs>
+        <rect x="0" y="0" width="900" height="420" fill="transparent"></rect>
+        <line x1="30" y1="210" x2="870" y2="210" stroke="#1c3d74" stroke-width="2" stroke-dasharray="4 4" opacity="0.6"></line>
+        <line x1="450" y1="40" x2="450" y2="380" stroke="#1c3d74" stroke-width="4" stroke-linecap="round" opacity="0.8"></line>
+        <g id="focus-markers" fill="none" stroke="#1c3d74" stroke-width="2" opacity="0.75">
+          <line id="left-2f" x1="210" y1="190" x2="210" y2="230"></line>
+          <text id="left-2f-label" x="210" y="250" text-anchor="middle" font-size="16" fill="#1c3d74">2F</text>
+          <line id="left-f" x1="330" y1="190" x2="330" y2="230"></line>
+          <text id="left-f-label" x="330" y="250" text-anchor="middle" font-size="16" fill="#1c3d74">F</text>
+          <line id="right-f" x1="570" y1="190" x2="570" y2="230"></line>
+          <text id="right-f-label" x="570" y="250" text-anchor="middle" font-size="16" fill="#1c3d74">F</text>
+          <line id="right-2f" x1="690" y1="190" x2="690" y2="230"></line>
+          <text id="right-2f-label" x="690" y="250" text-anchor="middle" font-size="16" fill="#1c3d74">2F</text>
+        </g>
+        <g id="objects"></g>
+        <g id="rays"></g>
+        <g id="ray-labels"></g>
+      </svg>
+      <p id="mode-guide">探索模式：拖动滑块观察成像随参数的变化。</p>
+      <p id="status-text" aria-live="polite">实时演示中：移动滑块观察成像规律。</p>
+    </section>
+
+    <section id="info" aria-labelledby="info-title">
       <h2 id="info-title">信息面板</h2>
       <div class="info-card" aria-live="polite">
         <h3>当前参数</h3>
@@ -811,13 +690,11 @@
           <li><span class="label">物距 u</span><span id="info-u">18.0 cm</span></li>
           <li><span class="label">焦距 f</span><span id="info-f">10.0 cm</span></li>
           <li><span class="label">物高 ho</span><span id="info-ho">3.0 cm</span></li>
-          <li><span class="label">像距 v</span><span id="info-v">— cm</span></li>
-          <li><span class="label">像高 hi</span><span id="info-hi">— cm</span></li>
-          <li><span class="label">放大率 m</span><span id="info-m">—</span></li>
         </ul>
       </div>
       <div class="info-card" aria-live="polite">
-        <h3>像的性质</h3>
+        <h3>成像结果</h3>
+        <p id="result-summary">像距 v：__ cm｜放大率 m：__｜像高 hi：__ cm</p>
         <p id="image-nature">
           <span class="badge" id="nature-type">待计算</span>
           <span id="orientation-text">—</span>
@@ -828,7 +705,118 @@
         <h3>教学提示</h3>
         <p id="teaching-tip">观察不同物距下的像距与像的性质，尝试总结规律～</p>
       </div>
-    </aside>
+
+      <div class="info-card mode-card active" data-mode="explore">
+        <h3>探索模式助手</h3>
+        <p>随时关注蓝色（实像）与橙色（虚像）箭头的变化，体会物距、像距、放大率之间的关系。</p>
+        <p>需要示范作图时可开启教师模式，出现焦点、2F 标记与作图步骤编号。</p>
+      </div>
+
+      <div class="info-card mode-card" data-mode="summary">
+        <h3>规律总结表</h3>
+        <p>对比不同物距区间的成像结果，尝试用自己的话概括规律。</p>
+        <table aria-label="凸透镜成像规律总结表">
+          <thead>
+            <tr>
+              <th>物距区间</th>
+              <th>成像类型</th>
+              <th>像距范围</th>
+              <th>放大率</th>
+              <th>像的特点</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>u &gt; 2f</td>
+              <td>实像</td>
+              <td>f &lt; v &lt; 2f</td>
+              <td>0 &lt; |m| &lt; 1</td>
+              <td>倒立、缩小</td>
+            </tr>
+            <tr>
+              <td>u = 2f</td>
+              <td>实像</td>
+              <td>v = 2f</td>
+              <td>|m| = 1</td>
+              <td>倒立、等大</td>
+            </tr>
+            <tr>
+              <td>f &lt; u &lt; 2f</td>
+              <td>实像</td>
+              <td>v &gt; 2f</td>
+              <td>|m| &gt; 1</td>
+              <td>倒立、放大</td>
+            </tr>
+            <tr>
+              <td>u = f</td>
+              <td>—</td>
+              <td>—</td>
+              <td>—</td>
+              <td>平行光，不成像</td>
+            </tr>
+            <tr>
+              <td>u &lt; f</td>
+              <td>虚像</td>
+              <td>v &lt; 0</td>
+              <td>|m| &gt; 1</td>
+              <td>正立、放大（放大镜）</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="info-card mode-card" data-mode="challenge">
+        <h3>挑战关卡</h3>
+        <p id="challenge-tip">读题后再操作，达成条件会自动判定。</p>
+        <ul id="challenge-list" class="challenge-list"></ul>
+        <div class="challenge-actions">
+          <button type="button" id="refresh-challenges">重新抽题</button>
+          <p id="challenge-feedback" aria-live="polite"></p>
+        </div>
+      </div>
+
+      <div class="info-card mode-card" data-mode="quiz">
+        <h3>课堂小测验</h3>
+        <p>作答后立即看到结果与解析，可随时重做。</p>
+        <div class="quiz-question" data-question="q1" data-type="truefalse" data-answer="false">
+          <h4>判断题</h4>
+          <p>当物距 u 小于焦距 f 时，屏幕上会得到一个实像。（对/错）</p>
+          <div class="quiz-options">
+            <label><input type="radio" name="q1" value="true"> 对</label>
+            <label><input type="radio" name="q1" value="false"> 错</label>
+          </div>
+          <p class="quiz-feedback" aria-live="polite"></p>
+        </div>
+        <div class="quiz-question" data-question="q2" data-type="single" data-answer="等大倒立实像">
+          <h4>单选题</h4>
+          <p>当物距 u = 2f 时，像的性质是什么？</p>
+          <div class="quiz-options">
+            <label><input type="radio" name="q2" value="倒立缩小实像"> 倒立缩小实像</label>
+            <label><input type="radio" name="q2" value="等大倒立实像"> 等大倒立实像</label>
+            <label><input type="radio" name="q2" value="正立放大虚像"> 正立放大虚像</label>
+          </div>
+          <p class="quiz-feedback" aria-live="polite"></p>
+        </div>
+        <div class="quiz-question" data-question="q3" data-type="calculation" data-answer-v="30" data-answer-nature="倒立放大实像">
+          <h4>计算题</h4>
+          <p>焦距 f = 10 cm，物距 u = 15 cm。请计算像距 v，并判断像的性质。</p>
+          <div class="quiz-options">
+            <label>像距 v = <input type="number" class="quiz-input" step="0.1" data-field="v" aria-label="像距答案"> cm</label>
+            <label>像的性质
+              <select class="quiz-input" data-field="nature" aria-label="像的性质答案">
+                <option value="">请选择</option>
+                <option value="倒立放大实像">倒立放大实像</option>
+                <option value="倒立缩小实像">倒立缩小实像</option>
+                <option value="正立放大虚像">正立放大虚像</option>
+              </select>
+            </label>
+          </div>
+          <p class="quiz-feedback" aria-live="polite"></p>
+        </div>
+        <p id="quiz-score">本次得分：0 / 3</p>
+        <button type="button" id="quiz-reset">重做测验</button>
+      </div>
+    </section>
   </main>
 
   <footer>
@@ -839,14 +827,11 @@
     (() => {
       const today = new Date().toISOString().slice(0, 10);
       console.log(`[LensLab] Step3 build OK @${today}`);
-      console.log(`[LensLab] Final UI Fix @${today}`);
 
       const SCALE = 12;
       const ORIGIN_X = 450;
       const AXIS_Y = 210;
-      const STAGE_HEIGHT = 420;
       const MODES = ['explore', 'summary', 'challenge', 'quiz'];
-      const SPRITES = ['candle', 'person', 'arrow'];
       const modePrompts = {
         explore: {
           hint: '拖动滑块看看会发生什么～',
@@ -875,11 +860,9 @@
         f: 'lenslab_f',
         ho: 'lenslab_ho',
         showRays: 'lenslab_showRays',
-        showScreen: 'lenslab_showScreen',
         teacherMode: 'lenslab_teacherMode',
         tolerance: 'lenslab_tol',
         mode: 'lenslab_mode',
-        sprite: 'lenslab_sprite',
         challengeConfig: 'lenslab_challengeConfig',
         challengeState: 'lenslab_challengeStates',
         quizScore: 'lenslab_quizScore'
@@ -890,11 +873,9 @@
         f: 10,
         ho: 3,
         showRays: true,
-        showScreen: false,
         teacherMode: false,
         tolerance: 0.5,
         mode: 'explore',
-        sprite: 'candle',
         challenges: [],
         challengeStates: {},
         quizResults: {}
@@ -902,9 +883,9 @@
 
       const supportsStorage = (() => {
         try {
-          const key = '__lenslab_test__';
-          window.localStorage.setItem(key, '1');
-          window.localStorage.removeItem(key);
+          const testKey = '__lenslab_test__';
+          window.localStorage.setItem(testKey, '1');
+          window.localStorage.removeItem(testKey);
           return true;
         } catch (err) {
           console.warn('[LensLab] localStorage 不可用，使用默认参数');
@@ -917,9 +898,6 @@
       }
 
       function formatNumber(value, digits = 1) {
-        if (value === null || value === undefined || Number.isNaN(value)) {
-          return '—';
-        }
         return Number(value).toFixed(digits);
       }
 
@@ -938,12 +916,10 @@
         const savedF = parseFloat(window.localStorage.getItem(STORAGE_KEYS.f));
         const savedHo = parseFloat(window.localStorage.getItem(STORAGE_KEYS.ho));
         const savedShowRays = window.localStorage.getItem(STORAGE_KEYS.showRays);
-        const savedShowScreen = window.localStorage.getItem(STORAGE_KEYS.showScreen);
         const savedTeacher = window.localStorage.getItem(STORAGE_KEYS.teacherMode);
         const savedTol = parseFloat(window.localStorage.getItem(STORAGE_KEYS.tolerance));
         const savedMode = window.localStorage.getItem(STORAGE_KEYS.mode);
-        const savedSprite = window.localStorage.getItem(STORAGE_KEYS.sprite);
-        const savedChallengeConfig = window.localStorage.getItem(STORAGE_KEYS.challengeConfig);
+        const savedChallenges = window.localStorage.getItem(STORAGE_KEYS.challengeConfig);
         const savedChallengeState = window.localStorage.getItem(STORAGE_KEYS.challengeState);
         const savedQuizScore = window.localStorage.getItem(STORAGE_KEYS.quizScore);
 
@@ -951,15 +927,13 @@
         if (!Number.isNaN(savedF)) state.f = clamp(savedF, 5, 15);
         if (!Number.isNaN(savedHo)) state.ho = clamp(savedHo, 1, 5);
         if (savedShowRays !== null) state.showRays = savedShowRays === 'true';
-        if (savedShowScreen !== null) state.showScreen = savedShowScreen === 'true';
         if (savedTeacher !== null) state.teacherMode = savedTeacher === 'true';
-        if (!Number.isNaN(savedTol) && savedTol >= 0.1 && savedTol <= 1) state.tolerance = savedTol;
+        if (!Number.isNaN(savedTol)) state.tolerance = clamp(savedTol, 0.1, 1);
         if (savedMode && MODES.includes(savedMode)) state.mode = savedMode;
-        if (savedSprite && SPRITES.includes(savedSprite)) state.sprite = savedSprite;
 
-        if (savedChallengeConfig) {
+        if (savedChallenges) {
           try {
-            const parsed = JSON.parse(savedChallengeConfig);
+            const parsed = JSON.parse(savedChallenges);
             if (Array.isArray(parsed)) {
               state.challenges = parsed;
             }
@@ -998,10 +972,8 @@
         fRange: document.getElementById('f-range'),
         hoRange: document.getElementById('ho-range'),
         showRays: document.getElementById('show-rays'),
-        showScreen: document.getElementById('show-screen'),
         teacherToggle: document.getElementById('teacher-mode-toggle'),
         tolRange: document.getElementById('tol-range'),
-        spriteSelect: document.getElementById('spriteSelect'),
         uDisplay: document.getElementById('u-display'),
         fDisplay: document.getElementById('f-display'),
         hoDisplay: document.getElementById('ho-display'),
@@ -1009,9 +981,7 @@
         infoU: document.getElementById('info-u'),
         infoF: document.getElementById('info-f'),
         infoHo: document.getElementById('info-ho'),
-        infoV: document.getElementById('info-v'),
-        infoHi: document.getElementById('info-hi'),
-        infoM: document.getElementById('info-m'),
+        resultSummary: document.getElementById('result-summary'),
         natureType: document.getElementById('nature-type'),
         orientationText: document.getElementById('orientation-text'),
         scaleText: document.getElementById('scale-text'),
@@ -1019,16 +989,10 @@
         statusText: document.getElementById('status-text'),
         modeGuide: document.getElementById('mode-guide'),
         modeHint: document.getElementById('mode-hint'),
-        stage: document.getElementById('stage-container'),
-        modeUi: document.getElementById('mode-ui'),
-        lensSvg: document.getElementById('lens-svg'),
-        modeTabs: Array.from(document.querySelectorAll('.mode-tab')),
-        raysGroup: document.getElementById('rays'),
+        stage: document.getElementById('stage'),
         objectsGroup: document.getElementById('objects'),
-        lensGroup: document.getElementById('lens'),
-        markersGroup: document.getElementById('markers'),
-        labelLayer: document.getElementById('label-layer'),
-        screenLayer: document.getElementById('screen-layer'),
+        raysGroup: document.getElementById('rays'),
+        rayLabelsGroup: document.getElementById('ray-labels'),
         focus: {
           leftF: document.getElementById('left-f'),
           leftFLabel: document.getElementById('left-f-label'),
@@ -1039,8 +1003,15 @@
           right2F: document.getElementById('right-2f'),
           right2FLabel: document.getElementById('right-2f-label')
         },
-        lensShape: document.getElementById('lens-shape'),
-        lensCenterLine: document.getElementById('lens-center-line'),
+        modeTabs: Array.from(document.querySelectorAll('.mode-tab')),
+        modeCards: Array.from(document.querySelectorAll('.mode-card')),
+        challengeList: document.getElementById('challenge-list'),
+        challengeFeedback: document.getElementById('challenge-feedback'),
+        challengeTip: document.getElementById('challenge-tip'),
+        refreshChallenges: document.getElementById('refresh-challenges'),
+        quizQuestions: Array.from(document.querySelectorAll('.quiz-question')),
+        quizScore: document.getElementById('quiz-score'),
+        quizReset: document.getElementById('quiz-reset'),
         selfTest: document.getElementById('self-test')
       };
 
@@ -1048,11 +1019,10 @@
       elements.fRange.value = state.f;
       elements.hoRange.value = state.ho;
       elements.showRays.checked = state.showRays;
-      elements.showScreen.checked = state.showScreen;
       elements.teacherToggle.checked = state.teacherMode;
       elements.tolRange.value = state.tolerance;
-      elements.spriteSelect.value = state.sprite;
-      elements.stage.dataset.modeLabel = modePrompts[state.mode].badge;
+      elements.stage.dataset.modeText = modePrompts[state.mode].badge;
+
       document.body.classList.toggle('teacher-mode', state.teacherMode);
 
       let animationHandle = null;
@@ -1081,43 +1051,10 @@
         setMarker(elements.focus.right2F, elements.focus.right2FLabel, right2F);
       }
 
-      function computeLensThickness(f) {
-        const mappedMax = 22;
-        const mappedMin = 6;
-        const ratio = (clamp(f, 5, 15) - 5) / 10;
-        const thickness = mappedMax - ratio * (mappedMax - mappedMin);
-        return clamp(thickness, 4, 26);
-      }
-
-      function updateLensShape(f) {
-        const thickness = computeLensThickness(f);
-        const halfThickness = thickness / 2;
-        const lensHalfHeight = clamp(STAGE_HEIGHT * 0.4, 140, 170);
-        const curvatureBand = lensHalfHeight * 0.4;
-        const topY = AXIS_Y - lensHalfHeight;
-        const bottomY = AXIS_Y + lensHalfHeight;
-        const controlOffset = 120 + (26 - thickness) * 3.2;
-        const leftX = ORIGIN_X - halfThickness;
-        const rightX = ORIGIN_X + halfThickness;
-        const pathData = `M ${leftX} ${topY} C ${leftX - controlOffset} ${AXIS_Y - curvatureBand}, ${leftX - controlOffset} ${AXIS_Y + curvatureBand}, ${leftX} ${bottomY} L ${rightX} ${bottomY} C ${rightX + controlOffset} ${AXIS_Y + curvatureBand}, ${rightX + controlOffset} ${AXIS_Y - curvatureBand}, ${rightX} ${topY} Z`;
-        elements.lensShape.setAttribute('d', pathData);
-        elements.lensCenterLine.setAttribute('x1', ORIGIN_X);
-        elements.lensCenterLine.setAttribute('x2', ORIGIN_X);
-        elements.lensCenterLine.setAttribute('y1', topY);
-        elements.lensCenterLine.setAttribute('y2', bottomY);
-      }
-
-      function clearGroup(group) {
-        while (group && group.firstChild) {
-          group.removeChild(group.firstChild);
-        }
-      }
-
-      function clearDynamicLayers() {
-        clearGroup(elements.objectsGroup);
-        clearGroup(elements.raysGroup);
-        clearGroup(elements.labelLayer);
-        clearGroup(elements.screenLayer);
+      function clearGroups() {
+        elements.objectsGroup.innerHTML = '';
+        elements.raysGroup.innerHTML = '';
+        elements.rayLabelsGroup.innerHTML = '';
       }
 
       function createLine(attrs) {
@@ -1128,68 +1065,131 @@
 
       function createPolyline(points, attrs = {}) {
         const polyline = document.createElementNS('http://www.w3.org/2000/svg', 'polyline');
-        polyline.setAttribute('points', points.map(pt => `${pt.x},${pt.y}`).join(' '));
+        polyline.setAttribute('points', points.map(point => `${point.x},${point.y}`).join(' '));
         Object.entries(attrs).forEach(([key, value]) => polyline.setAttribute(key, value));
         return polyline;
       }
 
-      function createText(x, y, content, attrs = {}) {
+      function createText(x, y, textContent) {
         const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
         text.setAttribute('x', x);
         text.setAttribute('y', y);
         text.setAttribute('text-anchor', 'middle');
-        text.textContent = content;
-        Object.entries(attrs).forEach(([key, value]) => text.setAttribute(key, value));
+        text.setAttribute('class', 'ray-label');
+        text.textContent = textContent;
         return text;
       }
 
-      function createUse({ x, y, scaleX = 1, scaleY = 1, href, role }) {
-        const use = document.createElementNS('http://www.w3.org/2000/svg', 'use');
-        use.setAttribute('href', `#${href}`);
-        use.setAttribute('transform', `translate(${x}, ${y}) scale(${scaleX}, ${scaleY})`);
-        use.setAttribute('data-role', role);
-        return use;
-      }
-      function renderObject(base, heightPx) {
-        const spriteHeight = Math.max(Math.abs(heightPx), 1);
-        const scale = spriteHeight / 60;
-        const spriteId = `sprite-${state.sprite}`;
-        const objectUse = createUse({
-          x: base.x,
-          y: base.y,
-          scaleX: scale,
-          scaleY: scale,
-          href: spriteId,
-          role: 'object'
-        });
-        elements.objectsGroup.appendChild(objectUse);
-        const label = createText(base.x, base.y + 26, '物体', { fill: '#1f7a3a', 'font-size': '16', 'font-weight': '600' });
-        elements.labelLayer.appendChild(label);
+      function updateInfoPanel({ v, m, hi }) {
+        elements.resultSummary.textContent = `像距 v：${formatNumber(v)} cm｜放大率 m：${formatNumber(m, 2)}｜像高 hi：${formatNumber(hi)} cm`;
+        const isReal = v > 0;
+        elements.natureType.textContent = isReal ? '实像' : '虚像';
+        elements.natureType.className = `badge ${isReal ? 'real' : 'virtual'}`;
+        const orientation = m < 0 ? '倒立' : '正立';
+        const absM = Math.abs(m);
+        let scaleText = '等大';
+        if (absM > 1.05) {
+          scaleText = '放大';
+        } else if (absM < 0.95) {
+          scaleText = '缩小';
+        }
+        elements.orientationText.textContent = `姿态：${orientation}`;
+        elements.scaleText.textContent = `大小：${scaleText}`;
+        elements.teachingTip.textContent = isReal
+          ? '蓝色像条表示实像，位于透镜右侧且常常倒立。试着改变物距观察放大率的增减！'
+          : '橙色像条表示虚像。虚像与物在同侧且正立放大，像在延长线上才能看到，就像放大镜。';
       }
 
-      function renderImage(base, heightPx, v) {
+      function updateStatusMessage(result) {
+        if (!result || result.noImage) {
+          elements.statusText.textContent = '接近平行光，不成像（光线将保持平行）';
+          elements.statusText.className = 'warning';
+          return;
+        }
+        const { v } = result;
         const isReal = v > 0;
-        const color = isReal ? '#1e6ffb' : '#ff8a00';
-        const spriteHeight = Math.max(Math.abs(heightPx), 1);
-        const scale = spriteHeight / 60;
-        const spriteId = `sprite-${state.sprite}`;
-        const scaleY = (heightPx >= 0 ? 1 : -1) * scale;
-        const imageUse = createUse({
-          x: base.x,
-          y: base.y,
-          scaleX: scale,
-          scaleY,
-          href: spriteId,
-          role: 'image'
+        elements.statusText.textContent = isReal
+          ? '已成实像：可以在透镜另一侧屏幕上接收到倒立像。'
+          : '形成虚像：需要从透镜左侧回看，才能看到放大的正立像。';
+        elements.statusText.className = isReal ? 'positive' : '';
+      }
+
+      function setMode(mode, { persist = true } = {}) {
+        if (!MODES.includes(mode)) return;
+        state.mode = mode;
+        if (persist) {
+          persistState('mode', mode);
+        }
+        updateModeUI();
+      }
+
+      function updateModeUI() {
+        elements.modeTabs.forEach(tab => {
+          const isActive = tab.dataset.mode === state.mode;
+          tab.classList.toggle('active', isActive);
+          tab.setAttribute('aria-selected', isActive ? 'true' : 'false');
+          tab.setAttribute('tabindex', isActive ? '0' : '-1');
         });
-        imageUse.setAttribute('class', `image${isReal ? '' : ' virtual'}`);
-        imageUse.setAttribute('fill', color);
-        imageUse.setAttribute('stroke', color);
-        imageUse.setAttribute('stroke-width', '1.2');
-        elements.objectsGroup.appendChild(imageUse);
-        const labelY = heightPx < 0 ? base.y + 26 : base.y - spriteHeight - 12;
-        const label = createText(base.x, labelY, '像', { fill: color, 'font-size': '16', 'font-weight': '600' });
-        elements.labelLayer.appendChild(label);
+
+        elements.modeCards.forEach(card => {
+          const isActive = card.dataset.mode === state.mode;
+          card.classList.toggle('active', isActive);
+        });
+
+        const prompt = modePrompts[state.mode];
+        elements.modeHint.textContent = prompt.hint;
+        elements.modeGuide.textContent = prompt.guide;
+        elements.stage.dataset.modeText = prompt.badge;
+      }
+
+      function renderObject(base, tip) {
+        const objectLine = createLine({
+          x1: base.x,
+          y1: base.y,
+          x2: tip.x,
+          y2: tip.y,
+          stroke: '#1c3d74',
+          'stroke-width': 4,
+          'stroke-linecap': 'round',
+          'marker-end': 'url(#arrow-head)'
+        });
+        const baseLine = createLine({
+          x1: base.x - 8,
+          y1: base.y,
+          x2: base.x + 8,
+          y2: base.y,
+          stroke: '#1c3d74',
+          'stroke-width': 3,
+          'stroke-linecap': 'round'
+        });
+        elements.objectsGroup.appendChild(objectLine);
+        elements.objectsGroup.appendChild(baseLine);
+      }
+
+      function renderImage(base, tip, v) {
+        const isReal = v > 0;
+        const color = isReal ? '#1c7ed6' : '#f08c00';
+        const imageLine = createLine({
+          x1: base.x,
+          y1: base.y,
+          x2: tip.x,
+          y2: tip.y,
+          stroke: color,
+          'stroke-width': 4,
+          'stroke-linecap': 'round',
+          'marker-end': 'url(#arrow-head)'
+        });
+        const baseLine = createLine({
+          x1: base.x - 8,
+          y1: base.y,
+          x2: base.x + 8,
+          y2: base.y,
+          stroke: color,
+          'stroke-width': 3,
+          'stroke-linecap': 'round'
+        });
+        elements.objectsGroup.appendChild(imageLine);
+        elements.objectsGroup.appendChild(baseLine);
       }
 
       function extendLine(pointA, pointB, targetX) {
@@ -1210,96 +1210,95 @@
         const firstMid = mid(objectTip, lensParallelPoint);
         const secondMid = mid(objectTip, lensCenter);
         const thirdMid = mid(objectTip, leftFocusPoint);
-        const label1 = createText(firstMid.x + 6, firstMid.y - 18, '①', { fill: '#1c3d74', 'font-weight': '700', 'font-size': '18' });
-        const label2 = createText(secondMid.x + 10, secondMid.y - 18, '②', { fill: '#1c3d74', 'font-weight': '700', 'font-size': '18' });
-        const label3 = createText(thirdMid.x, thirdMid.y - 18, '③', { fill: '#1c3d74', 'font-weight': '700', 'font-size': '18' });
-        elements.labelLayer.appendChild(label1);
-        elements.labelLayer.appendChild(label2);
-        elements.labelLayer.appendChild(label3);
+        const label1 = createText(firstMid.x + 6, firstMid.y - 18, '①');
+        const label2 = createText(secondMid.x + 10, secondMid.y - 18, '②');
+        const label3 = createText(thirdMid.x, thirdMid.y - 18, '③');
+        elements.rayLabelsGroup.appendChild(label1);
+        elements.rayLabelsGroup.appendChild(label2);
+        elements.rayLabelsGroup.appendChild(label3);
 
         if (!isReal) {
-          const note = createText(imageTip.x + 40, imageTip.y - 12, '延长线观测', { fill: '#555', 'font-size': '14' });
-          elements.labelLayer.appendChild(note);
+          const note = createText(imageTip.x + 50, imageTip.y - 20, '延长线观测');
+          note.setAttribute('font-size', '14');
+          elements.rayLabelsGroup.appendChild(note);
         }
       }
 
       function renderRays(objectTip, v, f, imageTip) {
-        const rayColor = '#1e6ffb';
-        const opacity = 0.55;
+        const isReal = v > 0;
+        const rayColor = isReal ? '#1c7ed6' : '#f08c00';
         const leftFocus = { x: ORIGIN_X - f * SCALE, y: AXIS_Y };
         const rightFocus = { x: ORIGIN_X + f * SCALE, y: AXIS_Y };
         const lensParallelPoint = { x: ORIGIN_X, y: objectTip.y };
         const lensCenter = { x: ORIGIN_X, y: AXIS_Y };
 
-        const ray1Points = [objectTip, lensParallelPoint];
-        if (v > 0) {
-          ray1Points.push(rightFocus, imageTip);
+        const ray1Points = [objectTip, lensParallelPoint, rightFocus];
+        if (isReal) {
+          ray1Points.push(imageTip);
         } else {
-          ray1Points.push(rightFocus, extendLine(rightFocus, imageTip, ORIGIN_X + 280));
+          ray1Points.push(extendLine(lensParallelPoint, rightFocus, ORIGIN_X + 260));
         }
         const ray1 = createPolyline(ray1Points, {
-          class: 'ray',
           stroke: rayColor,
-          'stroke-opacity': opacity,
+          'stroke-width': 2.5,
           fill: 'none',
-          'marker-end': 'url(#arrowhead)'
+          'marker-end': 'url(#ray-arrow)'
         });
 
         const slopeCenter = (lensCenter.y - objectTip.y) / (lensCenter.x - objectTip.x);
-        const ray2Target = v > 0 ? imageTip : { x: ORIGIN_X + 280, y: lensCenter.y + slopeCenter * 280 };
+        const ray2Target = isReal
+          ? imageTip
+          : { x: ORIGIN_X + 260, y: lensCenter.y + slopeCenter * 260 };
         const ray2 = createPolyline([
           objectTip,
           lensCenter,
           ray2Target
         ], {
-          class: 'ray',
           stroke: rayColor,
-          'stroke-opacity': opacity,
+          'stroke-width': 2.5,
           fill: 'none',
-          'marker-end': 'url(#arrowhead)'
+          'marker-end': 'url(#ray-arrow)'
         });
 
         const lensIntersectionForRay3 = lineIntersection(objectTip, leftFocus, ORIGIN_X);
-        const ray3Target = v > 0 ? imageTip : { x: ORIGIN_X + 280, y: lensIntersectionForRay3.y };
+        const ray3Target = isReal
+          ? imageTip
+          : { x: ORIGIN_X + 260, y: lensIntersectionForRay3.y };
         const ray3 = createPolyline([
           objectTip,
           lensIntersectionForRay3,
           ray3Target
         ], {
-          class: 'ray',
           stroke: rayColor,
-          'stroke-opacity': opacity,
+          'stroke-width': 2.5,
           fill: 'none',
-          'marker-end': 'url(#arrowhead)'
+          'marker-end': 'url(#ray-arrow)'
         });
 
         elements.raysGroup.appendChild(ray1);
         elements.raysGroup.appendChild(ray2);
         elements.raysGroup.appendChild(ray3);
 
-        if (v < 0) {
+        if (!isReal) {
           const dashedAttrs = {
             stroke: rayColor,
             'stroke-width': 1.5,
-            'stroke-opacity': 0.4,
             'stroke-dasharray': '6 6',
             fill: 'none'
           };
-          const ray1Dash = createPolyline([lensParallelPoint, imageTip], { ...dashedAttrs, class: 'ray dashed' });
-          const ray2Dash = createPolyline([lensCenter, imageTip], { ...dashedAttrs, class: 'ray dashed' });
-          const ray3Dash = createPolyline([lensIntersectionForRay3, imageTip], { ...dashedAttrs, class: 'ray dashed' });
+          const ray1Dash = createPolyline([lensParallelPoint, imageTip], dashedAttrs);
+          const ray2Dash = createPolyline([lensCenter, imageTip], dashedAttrs);
+          const ray3Dash = createPolyline([lensIntersectionForRay3, imageTip], dashedAttrs);
           elements.raysGroup.appendChild(ray1Dash);
           elements.raysGroup.appendChild(ray2Dash);
           elements.raysGroup.appendChild(ray3Dash);
         }
 
-        renderRayLabels(objectTip, lensParallelPoint, lensCenter, lensIntersectionForRay3, imageTip, v > 0);
+        renderRayLabels(objectTip, lensParallelPoint, lensCenter, lensIntersectionForRay3, imageTip, isReal);
       }
 
       function setNoImageState() {
-        elements.infoV.textContent = '— cm';
-        elements.infoHi.textContent = '— cm';
-        elements.infoM.textContent = '—';
+        elements.resultSummary.textContent = '像距 v：—｜放大率 m：—｜像高 hi：—';
         elements.natureType.textContent = '平行光，不成像';
         elements.natureType.className = 'badge';
         elements.orientationText.textContent = '—';
@@ -1319,210 +1318,159 @@
         return { v, m, hi, noImage: false };
       }
 
-      function updateInfoPanel({ v, m, hi }) {
-        elements.infoV.textContent = `${formatNumber(v)} cm`;
-        elements.infoHi.textContent = `${formatNumber(hi)} cm`;
-        elements.infoM.textContent = formatNumber(m, 2);
-        const isReal = v > 0;
-        elements.natureType.textContent = isReal ? '实像' : '虚像';
-        elements.natureType.className = `badge ${isReal ? 'real' : 'virtual'}`;
-        const orientation = m < 0 ? '倒立' : '正立';
-        const absM = Math.abs(m);
-        let scaleText = '等大';
-        if (absM > 1.05) {
-          scaleText = '放大';
-        } else if (absM < 0.95) {
-          scaleText = '缩小';
+      function createChallengeSet(existing) {
+        if (Array.isArray(existing) && existing.length >= 3) {
+          return existing;
         }
-        elements.orientationText.textContent = `姿态：${orientation}`;
-        elements.scaleText.textContent = `大小：${scaleText}`;
-        elements.teachingTip.textContent = isReal
-          ? '蓝色像表示实像，位于透镜右侧且常常倒立。试着改变物距观察放大率的变化！'
-          : '橙色像表示虚像，与物体在同侧且正立放大，就像放大镜一样需要回看才能看到。';
-      }
-
-      function updateStatusMessage(result) {
-        if (!result || result.noImage) {
-          elements.statusText.textContent = '接近平行光，不成像（光线将保持平行）';
-          elements.statusText.className = 'warning';
-          return;
-        }
-        const { v } = result;
-        const isReal = v > 0;
-        elements.statusText.textContent = isReal
-          ? '已成实像：透镜右侧可接收到倒立像。'
-          : '形成虚像：需要从透镜左侧观察才能看到正立放大像。';
-        elements.statusText.className = isReal ? 'positive' : '';
-      }
-
-      function drawScreen(x) {
-        const screen = createLine({
-          x1: x,
-          y1: AXIS_Y - 170,
-          x2: x,
-          y2: AXIS_Y + 170,
-          stroke: '#c6cdd7',
-          'stroke-width': 3,
-          'stroke-dasharray': '6 8'
-        });
-        elements.screenLayer.appendChild(screen);
-      }
-
-      function computeModeHtml() {
-        const prompt = modePrompts[state.mode];
-        if (state.mode === 'explore') {
-          return `<div class="mode-card" role="group"><h4>探索提示</h4><p>${prompt.hint}</p><p>拖动物距、焦距和物高，观察物体与像的相对位置变化。注意蓝色代表实像，橙色代表虚像。</p></div>`;
-        }
-        if (state.mode === 'summary') {
-          return `<div class="mode-card" role="group"><h4>规律总结</h4><p>${prompt.hint}</p><table aria-label="凸透镜成像规律总结表"><thead><tr><th>物距区间</th><th>成像类型</th><th>像距范围</th><th>放大率</th><th>特点</th></tr></thead><tbody><tr><td>u &gt; 2f</td><td>实像</td><td>f &lt; v &lt; 2f</td><td>0 &lt; |m| &lt; 1</td><td>倒立缩小</td></tr><tr><td>u = 2f</td><td>实像</td><td>v = 2f</td><td>|m| = 1</td><td>倒立等大</td></tr><tr><td>f &lt; u &lt; 2f</td><td>实像</td><td>v &gt; 2f</td><td>|m| &gt; 1</td><td>倒立放大</td></tr><tr><td>u = f</td><td>—</td><td>—</td><td>—</td><td>平行光</td></tr><tr><td>u &lt; f</td><td>虚像</td><td>v &lt; 0</td><td>|m| &gt; 1</td><td>正立放大</td></tr></tbody></table><p>记住：实像在透镜另一侧，虚像在同侧，多比较放大率的绝对值与符号，便能快速判断像的特征。</p></div>`;
-        }
-        if (state.mode === 'challenge') {
-          return `<div class="mode-card" role="group"><h4>挑战任务</h4><p id="challenge-tip">${prompt.hint}</p><ul id="challenge-list" class="challenge-list"></ul><div class="challenge-actions"><button type="button" class="btn" id="refresh-challenges">重新抽题</button><p id="challenge-feedback" aria-live="polite"></p></div></div>`;
-        }
-        return `<div class="mode-card" role="group"><h4>课堂测验</h4><p>${prompt.hint}</p><div class="quiz-question" data-question="q1" data-type="truefalse" data-answer="false"><h4>判断题</h4><p>当物距 u 小于焦距 f 时，屏幕上会得到一个实像。（对/错）</p><div class="quiz-options"><label><input type="radio" name="q1" value="true"> 对</label><label><input type="radio" name="q1" value="false"> 错</label></div><p class="quiz-feedback" aria-live="polite"></p></div><div class="quiz-question" data-question="q2" data-type="single" data-answer="等大倒立实像"><h4>单选题</h4><p>当物距 u = 2f 时，像的性质是什么？</p><div class="quiz-options"><label><input type="radio" name="q2" value="倒立缩小实像"> 倒立缩小实像</label><label><input type="radio" name="q2" value="等大倒立实像"> 等大倒立实像</label><label><input type="radio" name="q2" value="正立放大虚像"> 正立放大虚像</label></div><p class="quiz-feedback" aria-live="polite"></p></div><div class="quiz-question" data-question="q3" data-type="calculation" data-answer-v="30" data-answer-nature="倒立放大实像"><h4>计算题</h4><p>焦距 f = 10 cm，物距 u = 15 cm。请计算像距 v，并判断像的性质。</p><div class="quiz-options"><label>像距 v = <input type="number" class="quiz-input" step="0.1" data-field="v" aria-label="像距答案"> cm</label><label>像的性质<select class="quiz-input" data-field="nature" aria-label="像的性质答案"><option value="">请选择</option><option value="倒立放大实像">倒立放大实像</option><option value="倒立缩小实像">倒立缩小实像</option><option value="正立放大虚像">正立放大虚像</option></select></label></div><p class="quiz-feedback" aria-live="polite"></p></div><p id="quiz-score">本次得分：0 / 3</p><button type="button" class="btn" id="quiz-reset">重做测验</button></div>`;
-      }
-      function renderModeContent() {
-        elements.modeUi.innerHTML = computeModeHtml();
-        elements.challengeList = document.getElementById('challenge-list');
-        elements.challengeFeedback = document.getElementById('challenge-feedback');
-        elements.refreshChallenges = document.getElementById('refresh-challenges');
-        elements.quizQuestions = Array.from(document.querySelectorAll('#mode-ui .quiz-question'));
-        elements.quizScore = document.getElementById('quiz-score');
-        elements.quizReset = document.getElementById('quiz-reset');
-
-        if (elements.refreshChallenges) {
-          elements.refreshChallenges.addEventListener('click', () => {
-            state.challenges = createChallengeSet();
-            state.challengeStates = {};
-            saveChallenges();
-            renderChallenges();
-            setChallengeFeedbackMessage('result-bad', '已重新抽题，祝你好运！');
-            scheduleUpdate();
-          });
-        }
-
-        if (elements.quizReset) {
-          elements.quizReset.addEventListener('click', resetQuiz);
-        }
-
-        if (state.mode === 'challenge') {
-          renderChallenges();
-        }
-
-        if (state.mode === 'quiz') {
-          initQuiz();
-        }
-      }
-
-      function setMode(mode, { persist = true } = {}) {
-        if (!MODES.includes(mode)) return;
-        state.mode = mode;
-        if (persist) {
-          persistState('mode', mode);
-        }
-        updateModeUI();
-      }
-
-      function updateModeUI() {
-        elements.modeTabs.forEach(tab => {
-          const isActive = tab.dataset.mode === state.mode;
-          tab.classList.toggle('active', isActive);
-          tab.setAttribute('aria-selected', isActive ? 'true' : 'false');
-          tab.setAttribute('tabindex', isActive ? '0' : '-1');
-        });
-
-        const prompt = modePrompts[state.mode];
-        elements.modeHint.textContent = prompt.hint;
-        elements.modeGuide.textContent = prompt.guide;
-        elements.stage.dataset.modeLabel = prompt.badge;
-        renderModeContent();
-      }
-
-      function createChallengeSet(existing = state.challenges) {
-        const baseChallenges = [
-          {
-            id: 'challenge-a',
-            title: '倒立放大实像',
-            description: '使成像为倒立放大实像（v > 2f，u 介于 f 与 2f 之间）。',
-            validate: result => !result.noImage && result.v > 2 * state.f && result.v > 0 && Math.abs(result.m) > 1 && result.m < 0
-          },
-          {
-            id: 'challenge-b',
-            title: '等大成像',
-            description: '让物距接近 2f，像与物等大。',
-            validate: result => !result.noImage && Math.abs(state.u - 2 * state.f) <= state.tolerance && Math.abs(Math.abs(result.m) - 1) <= 0.05
-          },
-          {
-            id: 'challenge-c',
-            title: '放大镜模式',
-            description: '让物距小于焦距，出现正立放大虚像。',
-            validate: result => result.v < 0 && result.m > 1.05
+        const randomInRange = (min, max) => Math.round((min + Math.random() * (max - min)) * 10) / 10;
+        const baseF = randomInRange(8, 12);
+        const deltaLow = randomInRange(0.6, 1.2);
+        const deltaHigh = randomInRange(0.6, 1.2);
+        const minVMultiplier = randomInRange(2.2, 2.8);
+        const challengeA = {
+          id: 'A',
+          title: '关卡 A：倒立放大实像',
+          type: 'realMagnified',
+          params: {
+            targetF: baseF,
+            minU: baseF + deltaLow,
+            maxU: 2 * baseF - deltaHigh,
+            minV: minVMultiplier * baseF
           }
-        ];
+        };
 
-        const extraChallenges = [
-          {
-            id: 'challenge-d',
-            title: '缩小实像',
-            description: '调节到 u > 2f，像距介于 f 和 2f 之间，像缩小。',
-            validate: result => !result.noImage && state.u > 2 * state.f && result.v > state.f && result.v < 2 * state.f && Math.abs(result.m) < 1
+        const equalF = randomInRange(7, 11);
+        const challengeB = {
+          id: 'B',
+          title: '关卡 B：等大成像',
+          type: 'equalSize',
+          params: {
+            targetF: equalF
           }
-        ];
+        };
 
-        if (!existing || existing.length === 0) {
-          const pool = [...baseChallenges, ...extraChallenges];
-          return pool.sort(() => Math.random() - 0.5).slice(0, 3);
-        }
-        return existing;
+        const magnifierF = randomInRange(6, 11);
+        const boost = randomInRange(1.4, 1.8);
+        const challengeC = {
+          id: 'C',
+          title: '关卡 C：放大镜模式',
+          type: 'magnifier',
+          params: {
+            targetF: magnifierF,
+            minMagnification: boost
+          }
+        };
+
+        return [challengeA, challengeB, challengeC];
       }
+
+      state.challenges = createChallengeSet(state.challenges);
 
       function saveChallenges() {
         persistState('challengeConfig', state.challenges);
         persistState('challengeState', state.challengeStates);
       }
 
-      function setChallengeFeedbackMessage(statusClass, message) {
-        if (!elements.challengeFeedback) return;
-        elements.challengeFeedback.classList.remove('result-ok', 'result-bad');
-        if (statusClass) {
-          elements.challengeFeedback.classList.add(statusClass);
+      function describeChallenge(challenge) {
+        const { type, params, title } = challenge;
+        if (type === 'realMagnified') {
+          const { targetF, minU, maxU, minV } = params;
+          return {
+            title,
+            detail: `将焦距调到约 ${formatNumber(targetF)} cm（允许 ±TOL），并把物距控制在 ${formatNumber(minU)}～${formatNumber(maxU)} cm 之间，使像距超过 ${formatNumber(minV)} cm。`,
+            hint: '提示：物距略大于焦距时，像会远离透镜并放大。'
+          };
         }
-        elements.challengeFeedback.textContent = message;
+        if (type === 'equalSize') {
+          const { targetF } = params;
+          return {
+            title,
+            detail: `将焦距设置在 ${formatNumber(targetF)} cm 附近（±TOL），调节物距使其约等于 2f，观察像距是否也约等于 2f。`,
+            hint: '提示：物距 2f 时，像与物一样大且倒立。'
+          };
+        }
+        const { targetF, minMagnification } = params;
+        return {
+          title,
+          detail: `将焦距靠近 ${formatNumber(targetF)} cm，保持物体在焦点内侧（u < f），让放大率达到 ${formatNumber(minMagnification, 2)} 以上并得到虚像。`,
+          hint: '提示：物距比焦距略小时，就像拿放大镜看物体一样。'
+        };
       }
 
       function renderChallenges() {
-        if (!elements.challengeList) return;
         elements.challengeList.innerHTML = '';
         state.challenges.forEach(challenge => {
-          const li = document.createElement('li');
-          li.className = 'challenge-item';
-          li.setAttribute('data-id', challenge.id);
-          const passed = Boolean(state.challengeStates[challenge.id]);
-          if (passed) {
-            li.classList.add('passed');
+          const info = describeChallenge(challenge);
+          const item = document.createElement('li');
+          item.className = 'challenge-item';
+          if (state.challengeStates[challenge.id]) {
+            item.classList.add('passed');
           }
-          const statusClass = passed ? 'status result-ok' : 'status result-bad';
-          li.innerHTML = `<h4>${challenge.title}</h4><p>${challenge.description}</p><p class="${statusClass}">${passed ? '✅ 完成！' : '❌ 再试试～'}</p>`;
-          elements.challengeList.appendChild(li);
+          const title = document.createElement('h4');
+          title.textContent = info.title;
+          const detail = document.createElement('p');
+          detail.textContent = info.detail;
+          const status = document.createElement('p');
+          status.className = 'status';
+          status.textContent = state.challengeStates[challenge.id] ? '✅ 完成！' : '❌ 再试试～';
+          const hint = document.createElement('p');
+          hint.className = 'hint';
+          hint.textContent = info.hint;
+          item.appendChild(title);
+          item.appendChild(detail);
+          item.appendChild(status);
+          item.appendChild(hint);
+          elements.challengeList.appendChild(item);
         });
       }
 
-      function evaluateChallenges(result) {
-        if (!state.challenges.length) {
-          state.challenges = createChallengeSet();
-        }
-        if (!result || result.noImage) {
-          if (state.mode === 'challenge') {
-            renderChallenges();
-            setChallengeFeedbackMessage('result-bad', '请先调整参数再尝试。');
+      function challengeSatisfied(challenge, outcome) {
+        if (!outcome || outcome.noImage) return false;
+        const tol = state.tolerance;
+        switch (challenge.type) {
+          case 'realMagnified': {
+            const { targetF, minU, maxU, minV } = challenge.params;
+            const focusOk = Math.abs(state.f - targetF) <= tol;
+            const uOk = state.u >= (minU - tol) && state.u <= (maxU + tol);
+            const vOk = outcome.v > (minV - tol);
+            const magnifyOk = outcome.m < -1.05;
+            return focusOk && uOk && vOk && magnifyOk;
           }
+          case 'equalSize': {
+            const { targetF } = challenge.params;
+            const focusOk = Math.abs(state.f - targetF) <= tol;
+            const uOk = Math.abs(state.u - 2 * state.f) <= tol;
+            const vOk = Math.abs(outcome.v - 2 * state.f) <= tol;
+            const magnifyOk = Math.abs(Math.abs(outcome.m) - 1) <= 0.05;
+            return focusOk && uOk && vOk && magnifyOk;
+          }
+          case 'magnifier': {
+            const { targetF, minMagnification } = challenge.params;
+            const focusOk = Math.abs(state.f - targetF) <= tol;
+            const uInside = state.u < state.f - Math.max(0.2, tol / 2);
+            const virtualOk = outcome.v < 0 && outcome.m > minMagnification;
+            return focusOk && uInside && virtualOk;
+          }
+          default:
+            return false;
+        }
+      }
+
+      function evaluateChallenges(outcome) {
+        if (state.challenges.length === 0) return;
+        if (!outcome || outcome.noImage) {
+          if (state.mode === 'challenge') {
+            elements.challengeFeedback.textContent = '接近平行光暂无法判定，请先远离焦点位置。';
+          }
+          renderChallenges();
           return;
         }
+
         let changed = false;
         let lastUnlocked = '';
         state.challenges.forEach(challenge => {
-          const pass = !result.noImage && challenge.validate(result);
-          if (pass && !state.challengeStates[challenge.id]) {
+          const passed = challengeSatisfied(challenge, outcome);
+          if (passed && !state.challengeStates[challenge.id]) {
             state.challengeStates[challenge.id] = true;
             changed = true;
             lastUnlocked = `${challenge.title} ✅ 完成！`;
@@ -1533,15 +1481,16 @@
           saveChallenges();
         }
 
+        renderChallenges();
+
         if (state.mode === 'challenge') {
-          renderChallenges();
           const remaining = state.challenges.filter(ch => !state.challengeStates[ch.id]).length;
           if (changed) {
-            setChallengeFeedbackMessage('result-ok', lastUnlocked || '恭喜完成挑战！');
+            elements.challengeFeedback.textContent = lastUnlocked || '恭喜完成挑战！';
           } else if (remaining === 0) {
-            setChallengeFeedbackMessage('result-ok', '全部关卡完成！可以尝试调整容差或重新抽题。');
+            elements.challengeFeedback.textContent = '全部关卡完成！可以尝试调整容差或重新抽题。';
           } else {
-            setChallengeFeedbackMessage('result-bad', `尚有 ${remaining} 关待完成，加油！`);
+            elements.challengeFeedback.textContent = `尚有 ${remaining} 关待完成，加油！`;
           }
         }
       }
@@ -1555,9 +1504,6 @@
         if (id === 'show-rays') {
           state.showRays = checked;
           persistState('showRays', checked);
-        } else if (id === 'show-screen') {
-          state.showScreen = checked;
-          persistState('showScreen', checked);
         } else {
           const numericValue = parseFloat(value);
           if (id === 'u-range') {
@@ -1575,19 +1521,18 @@
         }
         scheduleUpdate();
       }
+
       function updateScene() {
         animationHandle = null;
         const u = clamp(parseFloat(elements.uRange.value), 5, 30);
         const f = clamp(parseFloat(elements.fRange.value), 5, 15);
         const ho = clamp(parseFloat(elements.hoRange.value), 1, 5);
         const showRays = elements.showRays.checked;
-        const showScreen = elements.showScreen.checked;
 
         state.u = u;
         state.f = f;
         state.ho = ho;
         state.showRays = showRays;
-        state.showScreen = showScreen;
 
         elements.uRange.value = u;
         elements.fRange.value = f;
@@ -1601,9 +1546,8 @@
         elements.infoF.textContent = `${formatNumber(f)} cm`;
         elements.infoHo.textContent = `${formatNumber(ho)} cm`;
 
-        updateLensShape(f);
         setFocusMarkers(f);
-        clearDynamicLayers();
+        clearGroups();
 
         if (Math.abs(u - f) < 0.1) {
           setNoImageState();
@@ -1613,21 +1557,15 @@
 
         const result = computeOutcome(u, f, ho);
         const objectBase = { x: ORIGIN_X - u * SCALE, y: AXIS_Y };
-        const objectHeightPx = ho * SCALE;
-        const objectTip = { x: objectBase.x, y: AXIS_Y - objectHeightPx };
+        const objectTip = { x: objectBase.x, y: AXIS_Y - ho * SCALE };
         const imageBase = { x: ORIGIN_X + result.v * SCALE, y: AXIS_Y };
-        const imageHeightPx = result.hi * SCALE;
-        const imageTip = { x: imageBase.x, y: AXIS_Y - imageHeightPx };
+        const imageTip = { x: imageBase.x, y: AXIS_Y - result.hi * SCALE };
 
-        renderObject(objectBase, objectHeightPx);
-        renderImage(imageBase, imageHeightPx, result.v);
+        renderObject(objectBase, objectTip);
+        renderImage(imageBase, imageTip, result.v);
 
         if (showRays) {
           renderRays(objectTip, result.v, f, imageTip);
-        }
-
-        if (showScreen && result.v > 0) {
-          drawScreen(imageBase.x);
         }
 
         updateInfoPanel(result);
@@ -1684,7 +1622,6 @@
 
       function setQuizFeedback(questionEl, status, message) {
         const feedback = questionEl.querySelector('.quiz-feedback');
-        if (!feedback) return;
         feedback.textContent = message;
         feedback.classList.remove('correct', 'incorrect');
         if (status === 'correct') {
@@ -1695,7 +1632,6 @@
       }
 
       function updateQuizScore() {
-        if (!elements.quizQuestions || !elements.quizScore) return;
         const total = elements.quizQuestions.length;
         const score = Object.values(state.quizResults).filter(value => value === true).length;
         elements.quizScore.textContent = `本次得分：${score} / ${total}`;
@@ -1711,7 +1647,6 @@
       function handleQuizChange(questionEl) {
         const type = questionEl.dataset.type;
         const id = questionEl.dataset.question;
-        if (!id) return null;
         let result = null;
         if (type === 'truefalse' || type === 'single') {
           const selected = questionEl.querySelector('input[type="radio"]:checked');
@@ -1719,7 +1654,7 @@
             setQuizFeedback(questionEl, null, '请选择一个选项。');
             state.quizResults[id] = null;
             updateQuizScore();
-            return null;
+            return;
           }
           const isCorrect = selected.value === questionEl.dataset.answer;
           state.quizResults[id] = isCorrect;
@@ -1734,7 +1669,7 @@
             setQuizFeedback(questionEl, null, '请填写完整的像距和性质。');
             state.quizResults[id] = null;
             updateQuizScore();
-            return null;
+            return;
           }
           const targetV = parseFloat(questionEl.dataset.answerV);
           const targetNature = questionEl.dataset.answerNature;
@@ -1750,7 +1685,6 @@
       }
 
       function resetQuiz() {
-        if (!elements.quizQuestions) return;
         elements.quizQuestions.forEach(question => {
           question.querySelectorAll('input[type="radio"]').forEach(input => {
             input.checked = false;
@@ -1768,14 +1702,12 @@
       }
 
       function initQuiz() {
-        if (!elements.quizQuestions) return;
         elements.quizQuestions.forEach(question => {
           const controls = question.querySelectorAll('input, select');
           controls.forEach(control => {
-            const handler = () => handleQuizChange(question);
-            control.addEventListener('change', handler);
+            control.addEventListener('change', () => handleQuizChange(question));
             if (control.type === 'number') {
-              control.addEventListener('input', handler);
+              control.addEventListener('input', () => handleQuizChange(question));
             }
           });
         });
@@ -1793,87 +1725,10 @@
         }
       }
 
-      function runSelfCheckUI() {
-        const logResult = (name, pass) => {
-          console.log(`[SelfCheckUI] ${name}: ${pass ? 'PASS' : 'FAIL'}`);
-        };
-
-        const stageRect = elements.stage.getBoundingClientRect();
-        const svgRect = elements.lensSvg.getBoundingClientRect();
-        const blankTop = Math.abs(svgRect.top - stageRect.top);
-        const blankBottom = Math.abs(stageRect.bottom - svgRect.bottom);
-        logResult('画布上下留白控制', blankTop < 60 && blankBottom < 60);
-
-        const originalMode = state.mode;
-        const originalTop = stageRect.top;
-        const originalHeight = stageRect.height;
-        let stageStable = true;
-        let cardWidthOk = true;
-        let cardBottomOk = true;
-        let cardScrollOk = true;
-        let summaryScrollSeen = false;
-
-        MODES.forEach(mode => {
-          setMode(mode, { persist: false });
-          const rect = elements.stage.getBoundingClientRect();
-          if (Math.abs(rect.top - originalTop) > 1.5 || Math.abs(rect.height - originalHeight) > 1.5) {
-            stageStable = false;
-          }
-          const card = elements.modeUi.querySelector('.mode-card');
-          if (card) {
-            const cardRect = card.getBoundingClientRect();
-            const widthRatio = cardRect.width / rect.width;
-            if (widthRatio < 0.5 || widthRatio > 0.7) {
-              cardWidthOk = false;
-            }
-            if (Math.abs(rect.bottom - cardRect.bottom) > 32) {
-              cardBottomOk = false;
-            }
-            const overflowY = window.getComputedStyle(card).overflowY;
-            if (overflowY !== 'auto') {
-              cardScrollOk = false;
-            }
-            if (mode === 'summary' && card.scrollHeight > card.clientHeight + 1) {
-              summaryScrollSeen = true;
-            }
-          } else {
-            stageStable = false;
-            cardWidthOk = false;
-            cardBottomOk = false;
-            cardScrollOk = false;
-          }
-        });
-
-        setMode(originalMode, { persist: false });
-
-        logResult('模式切换画布稳定', stageStable);
-        logResult('模式卡片宽度与位置', cardWidthOk && cardBottomOk);
-        logResult('模式卡片可滚动', cardScrollOk && summaryScrollSeen);
-
-        const lensBox = elements.lensShape.getBBox();
-        const stageWidth = elements.stage.getBoundingClientRect().width;
-        const lensWidthOk = lensBox.width <= stageWidth * 0.35;
-        const lensHeightOk = lensBox.height <= 340;
-        logResult('透镜尺寸限制', lensWidthOk && lensHeightOk);
-
-        const sample = computeOutcome(18, 10, 3);
-        const expectedV = (10 * 18) / (18 - 10);
-        const expectedM = -expectedV / 18;
-        const expectedHi = expectedM * 3;
-        const physicsOk = Math.abs(sample.v - expectedV) < 1e-6 && Math.abs(sample.m - expectedM) < 1e-6 && Math.abs(sample.hi - expectedHi) < 1e-6;
-        logResult('物理公式未改动', physicsOk);
-
-        const combinedText = `${elements.modeUi.textContent || ''} ${elements.challengeFeedback ? elements.challengeFeedback.textContent || '' : ''}`;
-        logResult('反馈无 undefined 文案', !/undefined/i.test(combinedText));
-
-        scheduleUpdate();
-      }
-
       elements.uRange.addEventListener('input', handleInputChange);
       elements.fRange.addEventListener('input', handleInputChange);
       elements.hoRange.addEventListener('input', handleInputChange);
       elements.showRays.addEventListener('input', handleInputChange);
-      elements.showScreen.addEventListener('input', handleInputChange);
 
       elements.teacherToggle.addEventListener('change', event => {
         state.teacherMode = event.target.checked;
@@ -1889,15 +1744,6 @@
         scheduleUpdate();
       });
 
-      elements.spriteSelect.addEventListener('change', event => {
-        const value = event.target.value;
-        if (SPRITES.includes(value)) {
-          state.sprite = value;
-          persistState('sprite', value);
-          scheduleUpdate();
-        }
-      });
-
       elements.modeTabs.forEach(tab => {
         tab.addEventListener('click', () => setMode(tab.dataset.mode));
         tab.addEventListener('keydown', event => {
@@ -1908,22 +1754,28 @@
         });
       });
 
+      elements.refreshChallenges.addEventListener('click', () => {
+        state.challenges = createChallengeSet();
+        state.challengeStates = {};
+        saveChallenges();
+        renderChallenges();
+        elements.challengeFeedback.textContent = '已重新抽题，祝你好运！';
+        scheduleUpdate();
+      });
+
+      elements.quizReset.addEventListener('click', resetQuiz);
       elements.selfTest.addEventListener('click', runSelfTest);
 
       if (window.location.hash.includes('dev')) {
         document.body.classList.add('dev-mode');
       }
 
-      state.challenges = createChallengeSet(state.challenges);
-      updateToleranceDisplay();
+      renderChallenges();
       updateModeUI();
+      updateToleranceDisplay();
+      initQuiz();
       scheduleUpdate();
-      requestAnimationFrame(() => runSelfCheckUI());
     })();
   </script>
-
-  <!-- CHANGELOG 2025-02-14:
-  Tightened stage frame, clamped lens height/thickness, rebuilt mode overlay,
-  unified module typography, and guarded challenge feedback messaging. -->
 </body>
 </html>
