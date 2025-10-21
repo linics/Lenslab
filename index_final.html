@@ -79,6 +79,7 @@
       flex-direction: column;
       gap: 16px;
       min-height: 0;
+      position: relative;
     }
 
     #controls,
@@ -293,6 +294,75 @@
       border-radius: 14px;
       background: rgba(255, 255, 255, 0.92);
       box-shadow: inset 0 0 0 1px rgba(28, 61, 116, 0.08);
+    }
+
+    .feature-list {
+      margin: 0;
+      padding-left: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      font-size: 15px;
+      color: var(--text);
+    }
+
+    .feature-list li::marker {
+      color: var(--primary);
+    }
+
+    .screenshot-selector {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .screenshot-selector button {
+      padding: 6px 14px;
+      border-radius: 999px;
+      border: 1px solid rgba(28, 61, 116, 0.3);
+      background: #ffffff;
+      color: var(--primary);
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .screenshot-selector button:hover,
+    .screenshot-selector button:focus-visible {
+      outline: none;
+      border-color: var(--primary);
+      background: var(--primary-soft);
+    }
+
+    .screenshot-selector button[aria-pressed="true"] {
+      background: var(--primary);
+      color: #ffffff;
+      box-shadow: 0 6px 16px rgba(28, 61, 116, 0.24);
+    }
+
+    .screenshot-status {
+      margin: 4px 0 0;
+      font-size: 14px;
+      color: var(--muted);
+    }
+
+    .highlighted-section {
+      box-shadow: 0 0 0 3px rgba(28, 61, 116, 0.4), 0 18px 38px rgba(28, 61, 116, 0.18);
+      z-index: 5;
+    }
+
+    .highlighted-section::before {
+      content: attr(data-highlight-label) ' 已高亮';
+      position: absolute;
+      top: 14px;
+      right: 16px;
+      padding: 4px 12px;
+      background: rgba(28, 61, 116, 0.92);
+      color: #ffffff;
+      font-size: 13px;
+      border-radius: 999px;
+      letter-spacing: 0.4px;
+      pointer-events: none;
     }
 
     .info-card h3 {
@@ -637,7 +707,7 @@
   </header>
 
   <main>
-    <section id="controls" aria-labelledby="controls-title">
+    <section id="controls" aria-labelledby="controls-title" data-highlight-label="控制区">
       <h2 id="controls-title">调节区</h2>
       <p class="hint" id="mode-hint">拖动滑块看看会发生什么～</p>
 
@@ -692,7 +762,7 @@
       <button type="button" id="self-test" class="dev-only">运行自检（开发专用）</button>
     </section>
 
-    <section id="stage" aria-labelledby="stage-title" data-mode-text="探索模式">
+    <section id="stage" aria-labelledby="stage-title" data-mode-text="探索模式" data-highlight-label="成像画布">
       <h2 id="stage-title">成像画布</h2>
       <nav id="mode-tabs" role="tablist" aria-label="模式切换">
         <button type="button" class="mode-tab" role="tab" aria-selected="true" data-mode="explore">探索</button>
@@ -736,7 +806,7 @@
       <p id="status-text" aria-live="polite">实时演示中：移动滑块观察成像规律。</p>
     </section>
 
-    <section id="info" aria-labelledby="info-title">
+    <section id="info" aria-labelledby="info-title" data-highlight-label="信息面板">
       <h2 id="info-title">信息面板</h2>
       <div class="info-card" aria-live="polite">
         <h3>当前参数</h3>
@@ -758,6 +828,27 @@
       <div class="info-card">
         <h3>教学提示</h3>
         <p id="teaching-tip">观察不同物距下的像距与像的性质，尝试总结规律～</p>
+      </div>
+
+      <div class="info-card" id="feature-overview">
+        <h3>核心功能速览</h3>
+        <ul class="feature-list">
+          <li>实时滑块控制三条主光线、烛焰示意与像距/放大率/像高计算，同步更新信息面板。</li>
+          <li>探索、规律总结、挑战、测验四大模式随时切换，提供操作提示、反馈与自检。</li>
+          <li>教师模式可显示焦点标记与作图步骤，并可调节挑战容差，所有关键设置支持本地记忆。</li>
+        </ul>
+      </div>
+
+      <div class="info-card" id="screenshot-helper">
+        <h3>截图提示</h3>
+        <p>选择下方按钮即可高亮对应功能区，辅助截取课堂讲义或操作说明截图。</p>
+        <div class="screenshot-selector" role="group" aria-label="功能区高亮选择">
+          <button type="button" data-highlight="controls" aria-pressed="false">控制区</button>
+          <button type="button" data-highlight="stage" aria-pressed="false">成像画布</button>
+          <button type="button" data-highlight="info" aria-pressed="false">信息面板</button>
+          <button type="button" data-highlight="clear" aria-pressed="false">取消高亮</button>
+        </div>
+        <p id="screenshot-status" class="screenshot-status" aria-live="polite">当前未选中，推荐截取全屏展示整体布局。</p>
       </div>
 
       <div class="info-card mode-card active" data-mode="explore">
@@ -910,6 +1001,11 @@
           badge: '测验模式'
         }
       };
+      const highlightLabels = {
+        controls: '左侧控制区',
+        stage: '中央成像画布',
+        info: '右侧信息面板'
+      };
 
       const STORAGE_KEYS = {
         u: 'lenslab_u',
@@ -1051,6 +1147,8 @@
         modeGuide: document.getElementById('mode-guide'),
         modeHint: document.getElementById('mode-hint'),
         stage: document.getElementById('stage'),
+        controlsSection: document.getElementById('controls'),
+        infoSection: document.getElementById('info'),
         objectsGroup: document.getElementById('objects'),
         raysGroup: document.getElementById('rays'),
         rayLabelsGroup: document.getElementById('ray-labels'),
@@ -1073,7 +1171,15 @@
         quizQuestions: Array.from(document.querySelectorAll('.quiz-question')),
         quizScore: document.getElementById('quiz-score'),
         quizReset: document.getElementById('quiz-reset'),
-        selfTest: document.getElementById('self-test')
+        selfTest: document.getElementById('self-test'),
+        screenshotButtons: Array.from(document.querySelectorAll('#screenshot-helper button[data-highlight]')),
+        screenshotStatus: document.getElementById('screenshot-status')
+      };
+
+      const layoutSections = {
+        controls: elements.controlsSection,
+        stage: elements.stage,
+        info: elements.infoSection
       };
 
       elements.uRange.value = state.u;
@@ -1094,6 +1200,37 @@
           cancelAnimationFrame(animationHandle);
         }
         animationHandle = requestAnimationFrame(updateScene);
+      }
+
+      function setScreenshotHighlight(target) {
+        if (!elements.screenshotButtons || elements.screenshotButtons.length === 0) return;
+        Object.values(layoutSections).forEach(section => {
+          if (section) {
+            section.classList.remove('highlighted-section');
+          }
+        });
+        elements.screenshotButtons.forEach(button => button.setAttribute('aria-pressed', 'false'));
+        const activeButton = elements.screenshotButtons.find(btn => btn.dataset.highlight === target);
+
+        if (!target || target === 'clear') {
+          if (activeButton) {
+            activeButton.setAttribute('aria-pressed', 'true');
+          }
+          elements.screenshotStatus.textContent = '当前未选中，推荐截取全屏展示整体布局。';
+          return;
+        }
+
+        const section = layoutSections[target];
+        if (section) {
+          section.classList.add('highlighted-section');
+          if (activeButton) {
+            activeButton.setAttribute('aria-pressed', 'true');
+          }
+          const label = highlightLabels[target] || '所选区域';
+          elements.screenshotStatus.textContent = `已高亮：${label}，可截取该区域展示对应功能。`;
+        } else {
+          elements.screenshotStatus.textContent = '未找到对应区域，可尝试重新选择。';
+        }
       }
 
       function setMarker(line, label, x) {
@@ -1802,6 +1939,15 @@
             }
           });
         }
+      }
+
+      if (elements.screenshotButtons && elements.screenshotButtons.length > 0) {
+        elements.screenshotButtons.forEach(button => {
+          button.addEventListener('click', () => {
+            setScreenshotHighlight(button.dataset.highlight);
+          });
+        });
+        setScreenshotHighlight('clear');
       }
 
       elements.uRange.addEventListener('input', handleInputChange);
