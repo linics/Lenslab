@@ -547,6 +547,40 @@
       min-width: 120px;
     }
 
+    /* --- Quiz Q3 specific width fixes --- */
+    .quiz-question[data-question="q3"] input.quiz-input[type="number"] {
+      box-sizing: border-box;
+      width: 80px;
+      min-width: 80px;
+      max-width: 100px;
+      /* Optional: align text centered for numbers */
+      text-align: center;
+    }
+
+    /* Let labels align-baseline so the "cm" suffix sits nicely */
+    .quiz-question[data-question="q3"] .quiz-options {
+      align-items: baseline;
+    }
+
+    /* Remove number spinners to save width on WebKit/Firefox (visual tidy) */
+    .quiz-question[data-question="q3"] input[type="number"]::-webkit-outer-spin-button,
+    .quiz-question[data-question="q3"] input[type="number"]::-webkit-inner-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+    }
+
+    .quiz-question[data-question="q3"] input[type="number"] {
+      -moz-appearance: textfield;
+    }
+
+    /* Optional: on very narrow screens, keep it readable but compact */
+    @media (max-width: 480px) {
+      .quiz-question[data-question="q3"] input.quiz-input[type="number"] {
+        width: 72px;
+        min-width: 72px;
+      }
+    }
+
     @media (max-width: 1100px) {
       main {
         grid-template-columns: minmax(240px, 300px) 1fr;
@@ -1821,6 +1855,7 @@
       updateToleranceDisplay();
       initQuiz();
       scheduleUpdate();
+      console.log('[LensLab] Quiz Q3 input width fix applied');
       console.log('[LensLab] Candle proportional scaling fix applied @2025-10-20');
     })();
   </script>
